@@ -1,70 +1,110 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
+import { StyleSheet, View } from "react-native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import ProfilScreen from "./screens/ProfilScreen";
 import EventsScreen from "./screens/EventsScreen";
 import CalendarScreen from "./screens/CalendarScreen";
 import FriendsScreen from "./screens/FriendsScreen";
-
 import LoginScreen from "./screens/LoginScreen";
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
+import signup from "./reducers/signup";
+
+const store = configureStore({
+  reducer: { signup },
+});
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   return (
-    <Tab.Navigator screenOptions={({ route }) => ({
-      tabBarIcon: ({ color, size }) => {
-        let iconName = '';
+    <Tab.Navigator
+      //  tabBarStyle: [
+      //       {left:20, right: 20, borderRadius:15, backgroundColor:'#9660DA'}, null
+      //  ]
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName = "";
 
-        if (route.name === 'Friends') {
-          iconName = 'users';
-        } 
-        
-        else if (route.name === 'Events') {
-          iconName = 'fort-awesome';
-        }
-         
-        else if (route.name === 'Calendar') {
-          iconName = 'calendar-plus-o';
-        }
+          switch (route.name) {
+            case "Friends":
+              iconName = "users";
+              break;
+            case "Events":
+              iconName = "fort-awesome";
+              break;
+            case "Calendar":
+              iconName = "calendar-plus-o";
+              break;
+            case "Profil":
+              iconName = "user";
+              break;
+          }
 
-        else if (route.name === 'Profil') {
-          iconName = 'user';
-        }
+          return <FontAwesome name={iconName} size={size} color={color} />;
+        },
 
-        else if (route.name === 'Test') {
-          iconName = 'user';
-        }
+        tabBarStyle: {
+          flex: 1,
+          backgroundColor: "white",
+          flexDirection: "row",
+          borderRadius: 50,
+          width: "95%",
+          height: 70,
+          marginHorizontal: 10,
+          marginBottom: 20,
+          position: "absolute",
+          borderWidth: 2,
+          borderColor: "#9660DA",
+          borderBottomWidth: 2,
+          borderTopWidth: 2,
+          borderBottomColor: "#9660DA",
+          borderTopColor: "#9660DA",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 10 },
+          shadowRadius: 10,
+          shadowOpacity: 0.3,
+          paddingTop:10,
+          alignSelf:'center',
+          gab:10,
+        },
+        tabBarActiveTintColor: "#ec6e5b",
+        tabBarInactiveTintColor: "#9660DA",
 
-        return <FontAwesome name={iconName} size={size} color={color} />;
-      },
-      tabBarActiveTintColor: '#ec6e5b',
-      tabBarInactiveTintColor: '#335561',
-      headerShown: false,
-    })}>
-      <Tab.Screen name="Friends" component={FriendsScreen} />
+        headerShown: false,
+      })}
+    >
+      <Tab.Screen
+        name="Friends"
+        component={FriendsScreen}
+        options={{ tabBarBadge: 3 }}
+      />
       <Tab.Screen name="Events" component={EventsScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
-     
     </Tab.Navigator>
   );
 };
 
-
-
 export default function App() {
   return (
-   
+    <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Home" component={LoginScreen} />
           <Stack.Screen name="TabNavigator" component={TabNavigator} />
         </Stack.Navigator>
       </NavigationContainer>
-   
+    </Provider>
   );
 }
+
+const styles = StyleSheet.create({
+  bottomTab: {
+    borderRadius: 50,
+    backgroundColor: "#9660DA",
+  },
+});

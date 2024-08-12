@@ -6,29 +6,76 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
-import React, { useState } from "react";
+
 import { Image } from "react-native";
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import EventsScreen from "./EventsScreen";
 
-const RegExpMail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-// const googlePng = () => {};
+import { useDispatch, useSelector } from "react-redux";
+import { signupState } from "../reducers/signup";
+import { useState, useEffect } from "react";
+import { BACK_END_URL } from "../config";
+
+const regExpMail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const regExpUser = /^[a-zA-Z][a-zA-Z0-9._]{2,14}$/;
+const regExpPassword = /^(?=.*?[0-9])(?=.*?[A-Za-z]).{8,32}$/;
+
 const LoginScreen = ({ navigation }) => {
   const [log, setLog] = useState(1);
 
   const [username, setUsername] = useState("");
+  const [usernameVerify, setUsernameVerify] = useState(false);
   const [email, setEmail] = useState("");
+  const [emailVerify, setEmailVerify] = useState(false);
   const [password, setPassword] = useState("");
+  const [passwordVerify, setPasswordVerify] = useState(false);
 
-  const [emailError, setEmailError] = useState(false);
+  const handleSubmit = (e) => {
+    console.log(email);
+    const data = { username, email, password };
 
-  const logIn = () => {
-    console.log(username, password);
+    fetch(BACK_END_URL + `/users/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("db");
+      });
+
+    setEmailVerify(!regExpMail.test(email));
+
+    setUsernameVerify(!regExpUser.test(username));
+
+    setPasswordVerify(!regExpPassword.test(password));
+
+    //  console.log(emailVerify)
+    //  console.log(usernameVerify)
+    //  console.log(passwordVerify)
+
+    //  if (emailVerify && usernameVerify && passwordVerify){
+
+    //   navigation.navigate("TabNavigator")
+    //  }
   };
 
-  const signUp = () => {
-    console.log(email, username, password);
+  const handleLogIn = () => {
+    const data = { username, password, email };
+    fetch(BACK_END_URL + `/users/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.token) {
+         
+          navigation.navigate("TabNavigator");
+        }
+
+      });
+      
   };
 
   return (
@@ -46,13 +93,18 @@ const LoginScreen = ({ navigation }) => {
                   <FontAwesome style={styles.fontAwesome} name="envelope-o" />
                   <TextInput
                     keyboardType="email-address"
+                    textContentType="emailAddress"
+                    autoComplete="email"
                     style={styles.boxRadius}
                     placeholder="Email"
                     placeholderTextColor="#C0C0C0"
                     value={email}
-                    onChangeText={(text) => setEmail(text)}
+                    onChangeText={(value) => setEmail(value)}
                   />
                 </View>
+                {emailVerify && (
+                  <Text style={styles.error}>Email invalide</Text>
+                )}
               </View>
 
               {/****************************User-name****************************************/}
@@ -65,9 +117,12 @@ const LoginScreen = ({ navigation }) => {
                     placeholder="Username"
                     placeholderTextColor="#C0C0C0"
                     value={username}
-                    onChangeText={(text) => setUsername(text)}
+                    onChangeText={(value) => setUsername(value)}
                   />
                 </View>
+                {usernameVerify && (
+                  <Text style={styles.error}>Username invalide</Text>
+                )}
               </View>
 
               {/**********************************Password***********************************/}
@@ -81,13 +136,19 @@ const LoginScreen = ({ navigation }) => {
                     placeholder="Password"
                     placeholderTextColor="#C0C0C0"
                     value={password}
-                    onChangeText={(text) => setPassword(text)}
+                    onChangeText={(value) => setPassword(value)}
                   />
                 </View>
+                {passwordVerify && (
+                  <Text style={styles.error}>Password invalide</Text>
+                )}
               </View>
 
               {/**********************************Sign-Up***********************************/}
-              <TouchableOpacity style={styles.signup} onPress={signUp}>
+              <TouchableOpacity
+                style={styles.signup}
+                onPress={() => handleSubmit()}
+              >
                 <Text
                   style={{ color: "white", fontWeight: "bold", fontSize: 25 }}
                 >
@@ -100,7 +161,7 @@ const LoginScreen = ({ navigation }) => {
               </Text>
 
               {/**********************************Google***********************************/}
-              <TouchableOpacity style={styles.boxRadius} onPress={signUp}>
+              <TouchableOpacity style={styles.boxRadius}>
                 <Image
                   style={styles.googleImg}
                   source={require("../assets/google.png")}
@@ -164,7 +225,7 @@ const LoginScreen = ({ navigation }) => {
               {/**********************************Login***********************************/}
               <TouchableOpacity
                 style={styles.signup}
-                onPress={() => navigation.navigate("TabNavigator")}
+                onPress={() => handleLogIn()}
               >
                 <Text
                   style={{ color: "white", fontWeight: "bold", fontSize: 25 }}
@@ -192,8 +253,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#9660DA",
-    // alignItems: "center",
-    // justifyContent: "center",
+   
   },
   logTitle: {
     fontSize: 40,
@@ -271,6 +331,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     color: "white",
+  },
+  error: {
+    color: "purple",
+    marginTop: 10,
   },
 
   // flex-row items-center w-full p-5 border-2 mb-10 border-purple-700 rounded-full

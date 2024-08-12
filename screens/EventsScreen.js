@@ -11,11 +11,16 @@ import {
   Platform,
 } from "react-native";
 
+
+
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const EventsScreen = () => {
+  
   return (
-    <SafeAreaView style={styles.container}>
+
+    <View  style={styles.container}>
+      <SafeAreaView style={{backgroundColor:'#9660DA'}} />
       <View style={styles.title}>
         <Text style={{ fontSize: 25, fontWeight: "bold", color: "white" }}>
           Événements
@@ -206,7 +211,10 @@ const EventsScreen = () => {
           </View>
         </ScrollView>
       </View>
-    </SafeAreaView>
+
+      <SafeAreaView style={{backgroundColor:'white'}}/>
+    </View>
+    
   );
 };
 
@@ -214,15 +222,17 @@ export default EventsScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex:1,
     paddingTop: Platform.OS === "android" ? 35 : 0,
-    backgroundColor: "#9660DA",
+    backgroundColor: "green",
   },
   title: {
     width: "100%",
     backgroundColor: "#9660DA",
     alignItems: "center",
-    paddingBottom: 10,
+    height: "5%",
+    
+   
   },
   mainContainer: {
     flex: 1,
@@ -232,6 +242,7 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     paddingRight: 28,
     paddingLeft: 28,
+    
   },
   searchSection: {
     flexDirection: "row",

@@ -1,5 +1,13 @@
 {
   "expo": {
+    "plugins": [
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps._some_id_here_"
+        }
+      ]
+    ],
     "name": "HANG-OUT-FRONT-END",
     "slug": "HANG-OUT-FRONT-END",
     "version": "1.0.0",
@@ -18,7 +26,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "android.hang_out"
     },
     "web": {
       "favicon": "./assets/favicon.png"
