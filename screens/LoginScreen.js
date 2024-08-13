@@ -15,13 +15,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { signupState } from "../reducers/signup";
 import { useState, useEffect } from "react";
 import { BACK_END_URL } from "../config";
+import ProfileCreationScreen from "./ProfileCreationScreen";
 
 const regExpMail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const regExpUser = /^[a-zA-Z][a-zA-Z0-9._]{2,14}$/;
 const regExpPassword = /^(?=.*?[0-9])(?=.*?[A-Za-z]).{8,32}$/;
 
 const LoginScreen = ({ navigation }) => {
-  const [log, setLog] = useState(1);
+  const [log, setLog] = useState(2);
 
   const [username, setUsername] = useState("");
   const [usernameVerify, setUsernameVerify] = useState(false);
@@ -82,13 +83,19 @@ const LoginScreen = ({ navigation }) => {
     <>
       {log === 1 ? (
         <SafeAreaView style={styles.container}>
-          <View style={{ flex: 1, alignItems: "center", marginTop: 40 }}>
-            <Text style={styles.logTitle}>Sign Up</Text>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              marginTop: 50,
+            }}
+          >
+            <Text style={styles.logTitle}>Welcome to HangOut</Text>
 
             <View style={styles.inputContainer}>
               {/************************************Mail*************************************/}
               <View style={styles.inputSection}>
-                <Text style={styles.inputTitle}>Mail</Text>
+                {/* <Text style={styles.inputTitle}>Mail</Text> */}
                 <View style={styles.boxContainer}>
                   <FontAwesome style={styles.fontAwesome} name="envelope-o" />
                   <TextInput
@@ -109,7 +116,7 @@ const LoginScreen = ({ navigation }) => {
 
               {/****************************User-name****************************************/}
               <View style={styles.inputSection}>
-                <Text style={styles.inputTitle}>Username</Text>
+                {/* <Text style={styles.inputTitle}>Username</Text> */}
                 <View style={styles.boxContainer}>
                   <FontAwesome style={styles.fontAwesome} name="user" />
                   <TextInput
@@ -127,7 +134,7 @@ const LoginScreen = ({ navigation }) => {
 
               {/**********************************Password***********************************/}
               <View style={styles.inputSection}>
-                <Text style={styles.inputTitle}>Password</Text>
+                {/* <Text style={styles.inputTitle}>Password</Text> */}
                 <View style={styles.boxContainer}>
                   <FontAwesome style={styles.fontAwesome} name="lock" />
                   <TextInput
@@ -155,37 +162,53 @@ const LoginScreen = ({ navigation }) => {
                   Sign Up
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity onPress={() => setLog(2)}>
+                <Text
+                  style={{ marginTop: 30, color: "#9660DA", fontWeight: "600" }}
+                >
+                  Already have a account? Log in
+                </Text>
+              </TouchableOpacity>
 
-              <Text style={{ marginBottom: 20, marginTop: 20, color: "white" }}>
+              <Text
+                style={{ marginBottom: 20, marginTop: 20, color: "#9660DA" }}
+              >
                 OR
               </Text>
 
               {/**********************************Google***********************************/}
-              <TouchableOpacity style={styles.boxRadius}>
+
+              <TouchableOpacity style={styles.googleBoxRadius} onPress={signUp}>
                 <Image
                   style={styles.googleImg}
                   source={require("../assets/google.png")}
                 />
                 <Text style={styles.googleText}>Sign up with Google</Text>
               </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => setLog(2)}>
-                <Text style={{ marginTop: 60, color: "white" }}>
-                  Already have a account?
-                </Text>
-              </TouchableOpacity>
             </View>
           </View>
         </SafeAreaView>
       ) : (
         <SafeAreaView style={styles.container}>
-          <View style={{ flex: 1, alignItems: "center", marginTop: 40 }}>
-            <Text style={styles.logTitle}>Login</Text>
+          <View style={{ flex: 1, alignItems: "center", marginTop: 50 }}>
+            <Text style={styles.logTitle}>Welcome to HangOut</Text>
+
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "600",
+                marginTop: 30,
+                marginBottom: 20,
+                color: "grey",
+              }}
+            >
+              Connect to my account
+            </Text>
 
             <View style={styles.inputContainer}>
               {/****************************User-name****************************************/}
               <View style={styles.inputSection}>
-                <Text style={styles.inputTitle}>Username</Text>
+                {/* <Text style={styles.inputTitle}>Username</Text> */}
                 <View style={styles.boxContainer}>
                   <FontAwesome style={styles.fontAwesome} name="user" />
                   <TextInput
@@ -197,10 +220,9 @@ const LoginScreen = ({ navigation }) => {
                   />
                 </View>
               </View>
-
               {/**********************************Password***********************************/}
               <View style={styles.inputSection}>
-                <Text style={styles.inputTitle}>Password</Text>
+                {/* <Text style={styles.inputTitle}>Password</Text> */}
                 <View style={styles.boxContainer}>
                   <FontAwesome style={styles.fontAwesome} name="lock" />
                   <TextInput
@@ -213,33 +235,47 @@ const LoginScreen = ({ navigation }) => {
                   />
                 </View>
               </View>
-
               <TouchableOpacity>
                 <Text
-                  style={{ marginBottom: 30, marginTop: 0, color: "white" }}
+                  style={{ marginBottom: 30, marginTop: -25, color: "#9660DA" }}
                 >
-                  Forgot password?
+                  Forgotten password?
                 </Text>
               </TouchableOpacity>
-
               {/**********************************Login***********************************/}
               <TouchableOpacity
                 style={styles.signup}
                 onPress={() => handleLogIn()}
               >
                 <Text
-                  style={{ color: "white", fontWeight: "bold", fontSize: 25 }}
+                  style={{ color: "white", fontWeight: "bold", fontSize: 20 }}
                 >
                   Login
                 </Text>
               </TouchableOpacity>
-
-              <Text style={{ marginBottom: 20, marginTop: 20, color: "white" }}>
+              <TouchableOpacity onPress={() => setLog(1)}>
+                <Text
+                  style={{ color: "#9660DA", fontWeight: "600", marginTop: 15 }}
+                >
+                  Don't have an account ? Sign up here.
+                </Text>
+              </TouchableOpacity>
+              <Text
+                style={{
+                  marginBottom: 20,
+                  marginTop: 60,
+                  color: "#9660DA",
+                  fontWeight: "800",
+                }}
+              >
                 OR
               </Text>
-
-              <TouchableOpacity onPress={() => setLog(1)}>
-                <Text style={{ color: "white" }}>SIGN UP</Text>
+              <TouchableOpacity style={styles.googleBoxRadius} onPress={signUp}>
+                <Image
+                  style={styles.googleImg}
+                  source={require("../assets/google.png")}
+                />
+                <Text style={styles.googleText}>Sign in with Google</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -252,29 +288,28 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#9660DA",
-   
+    backgroundColor: "#fff",
+    // alignItems: "center",
+    // justifyContent: "center",
   },
   logTitle: {
-    fontSize: 40,
+    fontSize: 30,
     fontWeight: "bold",
-    color: "white",
+    color: "#9660DA",
     marginBottom: 20,
   },
   inputContainer: {
-    flex: 1,
     width: "100%",
-    padding: 5,
     alignItems: "center",
     justifyContent: "center",
   },
   inputSection: {
     width: "100%",
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 30,
   },
   boxContainer: {
-    width: "100%",
+    width: "80%",
     flexDirection: "row",
     alignItems: "center",
     textAlign: "center",
@@ -283,11 +318,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    height: 60,
+    height: 50,
     borderRadius: 50,
     borderWidth: 2,
     paddingHorizontal: 45,
-    borderColor: "white",
+    borderColor: "#9660DA",
     position: "relative",
   },
   fontAwesome: {
@@ -297,7 +332,8 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginBottom: 16,
     padding: 0,
-    color: "white",
+    paddingLeft: 5,
+    color: "#9660DA",
   },
   inputTitle: {
     position: "absolute",
@@ -307,17 +343,16 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
     zIndex: 5,
     fontWeight: "bolder",
-    color: "white",
+    color: "#9660DA",
   },
 
   signup: {
     backgroundColor: "#9660DA",
     justifyContent: "center",
     alignItems: "center",
-    width: "100%",
-    height: 60,
+    width: "80%",
+    height: 50,
     borderRadius: 50,
-    borderWidth: 2,
     paddingHorizontal: 45,
     borderColor: "white",
     position: "relative",
@@ -325,12 +360,27 @@ const styles = StyleSheet.create({
   googleImg: {
     width: 30,
     height: 30,
-    marginRight: 50,
+    marginRight: 20,
   },
   googleText: {
     fontWeight: "bold",
     fontSize: 20,
-    color: "white",
+    color: "#9660DA",
+  }, 
+  googleBoxRadius: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "80%",
+    height: 50,
+    borderRadius: 50,
+    borderWidth: 2,
+    paddingHorizontal: 40,
+    borderColor: "#9660DA",
+    position: "relative",
+  },
+  error: {
+    color: "purple",
+    marginTop: 10,
   },
   error: {
     color: "purple",
