@@ -17,7 +17,8 @@ import { useState, useEffect } from "react";
 import { BACK_END_URL } from "../config";
 import ProfileCreationScreen from "./ProfileCreationScreen";
 
-const regExpMail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const regExpMail =
+  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const regExpUser = /^[a-zA-Z][a-zA-Z0-9._]{2,14}$/;
 const regExpPassword = /^(?=.*?[0-9])(?=.*?[A-Za-z]).{8,32}$/;
 
@@ -59,6 +60,7 @@ const LoginScreen = ({ navigation }) => {
 
     //   navigation.navigate("TabNavigator")
     //  }
+    navigation.navigate("ProfileCreationScreen");
   };
 
   const handleLogIn = () => {
@@ -71,12 +73,9 @@ const LoginScreen = ({ navigation }) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.token) {
-         
           navigation.navigate("TabNavigator");
         }
-
       });
-      
   };
 
   return (
@@ -178,7 +177,10 @@ const LoginScreen = ({ navigation }) => {
 
               {/**********************************Google***********************************/}
 
-              <TouchableOpacity style={styles.googleBoxRadius} onPress={signUp}>
+              <TouchableOpacity
+                style={styles.googleBoxRadius}
+                onPress={() => navigation.navigate("ProfileCreationScreen")}
+              >
                 <Image
                   style={styles.googleImg}
                   source={require("../assets/google.png")}
@@ -270,7 +272,10 @@ const LoginScreen = ({ navigation }) => {
               >
                 OR
               </Text>
-              <TouchableOpacity style={styles.googleBoxRadius} onPress={signUp}>
+              <TouchableOpacity
+                style={styles.googleBoxRadius}
+                onPress={() => navigation.navigate("ProfileCreationScreen")}
+              >
                 <Image
                   style={styles.googleImg}
                   source={require("../assets/google.png")}
@@ -366,7 +371,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     color: "#9660DA",
-  }, 
+  },
   googleBoxRadius: {
     flexDirection: "row",
     alignItems: "center",
