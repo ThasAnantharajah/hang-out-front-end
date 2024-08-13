@@ -56,10 +56,10 @@ const LoginScreen = ({ navigation }) => {
     //  console.log(usernameVerify)
     //  console.log(passwordVerify)
 
-    //  if (emailVerify && usernameVerify && passwordVerify){
-
-    //   navigation.navigate("TabNavigator")
-    //  }
+    if (emailVerify && usernameVerify && passwordVerify) {
+      // navigation.navigate("TabNavigator")
+      // navigation.navigate("ProfileCreationScreen");
+    }
     navigation.navigate("ProfileCreationScreen");
   };
 
