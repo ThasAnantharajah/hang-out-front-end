@@ -11,6 +11,7 @@ import LoginScreen from "./screens/LoginScreen";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import signup from "./reducers/signup";
+import { faAlignJustify } from "@fortawesome/free-solid-svg-icons";
 
 const store = configureStore({
   reducer: { signup },
@@ -22,9 +23,7 @@ const Tab = createBottomTabNavigator();
 const TabNavigator = () => {
   return (
     <Tab.Navigator
-      //  tabBarStyle: [
-      //       {left:20, right: 20, borderRadius:15, backgroundColor:'#9660DA'}, null
-      //  ]
+    
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName = "";
@@ -44,19 +43,33 @@ const TabNavigator = () => {
               break;
           }
 
-          return <FontAwesome name={iconName} size={size} color={color} />;
+          return (
+            <View style={{fle:1}}>
+            <FontAwesome
+              name={iconName}
+              size={size}
+              color={color}
+              style={{
+                backgroundColor: "yellow",
+                position:'absolute'
+              }}
+            />
+            </View>
+          );
         },
 
         tabBarStyle: {
-          flex: 1,
-          backgroundColor: "white",
           flexDirection: "row",
+          position: "absolute",
+          alignItems: "center",
+          justifyContent: "space-between",
+          backgroundColor: "white",
+          paddingTop: 10,
           borderRadius: 50,
           width: "95%",
           height: 70,
           marginHorizontal: 10,
           marginBottom: 20,
-          position: "absolute",
           borderWidth: 2,
           borderColor: "#9660DA",
           borderBottomWidth: 2,
@@ -67,13 +80,16 @@ const TabNavigator = () => {
           shadowOffset: { width: 0, height: 10 },
           shadowRadius: 10,
           shadowOpacity: 0.3,
-          paddingTop:10,
-          alignSelf:'center',
-          gab:10,
+        },
+        tabBarLabelStyle: {
+          color:'green',
+          backgroundColor:'black',
+          fontSize:'16',
+         
+
         },
         tabBarActiveTintColor: "#ec6e5b",
         tabBarInactiveTintColor: "#9660DA",
-
         headerShown: false,
       })}
     >
@@ -94,7 +110,7 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Home" component={LoginScreen} />
+          {/* <Stack.Screen name="Home" component={LoginScreen} /> */}
           <Stack.Screen name="TabNavigator" component={TabNavigator} />
         </Stack.Navigator>
       </NavigationContainer>
@@ -102,9 +118,4 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
-  bottomTab: {
-    borderRadius: 50,
-    backgroundColor: "#9660DA",
-  },
-});
+
