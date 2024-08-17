@@ -7,6 +7,8 @@ import ProfilScreen from "./screens/ProfilScreen";
 import EventsScreen from "./screens/EventsScreen";
 import CalendarScreen from "./screens/CalendarScreen";
 import FriendsScreen from "./screens/FriendsScreen";
+import ProfileCreationScreen from "./screens/ProfileCreationScreen";
+
 import LoginScreen from "./screens/LoginScreen";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
@@ -107,14 +109,16 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {/* <Stack.Screen name="Home" component={LoginScreen} /> */}
-          <Stack.Screen name="TabNavigator" component={TabNavigator} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </Provider>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Home" component={LoginScreen} />
+        <Stack.Screen name="TabNavigator" component={TabNavigator} />
+        <Stack.Screen
+          name="ProfileCreationScreen"
+          component={ProfileCreationScreen}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
