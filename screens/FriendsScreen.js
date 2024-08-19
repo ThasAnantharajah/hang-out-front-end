@@ -7,11 +7,34 @@ import {
   SafeAreaView,
   Image,
   Platform,
+  Modal,
 } from "react-native";
 
+import { useState } from "react";
+
 const FriendsScreen = () => {
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <SafeAreaView style={styles.container}>
+      <Modal  transparent visible={showModal} animationType="slide"  >
+        <View style={styles.modal}>
+          <View style={styles.modalWindow}>
+            <Text style={styles.modalText}> Confirmez-vous supression ? </Text>
+            <Text style={styles.modalName}> Julie</Text>
+
+            <View style={styles.modalBtns}>
+              <TouchableOpacity style={styles.vBtn}>
+                <Text style={{color:'white', fontWeight:'bold'}}>Confirmer</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cBtn}
+              onPress={()=>{setShowModal(false)}}>
+                <Text style={{color:'white', fontWeight:'bold'}}>Annuler</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.title}>
         <Text style={{ fontSize: 25, fontWeight: "bold", color: "white" }}>
           Mes amis
@@ -52,7 +75,7 @@ const FriendsScreen = () => {
               marginTop: 6,
             }}
           >
-            <Text style={{ fontWeight: "bold" }}>Annas,</Text>
+            <Text style={{ fontWeight: "bold" }}>Julie,</Text>
             <Text>28 ans</Text>
           </View>
           <View style={styles.interestContainer}>
@@ -86,7 +109,12 @@ const FriendsScreen = () => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.delete}>
+            <TouchableOpacity
+              style={styles.delete}
+              onPress={() => {
+                setShowModal(true);
+              }}
+            >
               <Text style={{ color: "#AE6C6B", fontWeight: "bold" }}>
                 Supprimer cet ami
               </Text>
@@ -265,4 +293,44 @@ const styles = StyleSheet.create({
     paddingRight: 8,
     paddingLeft: 8,
   },
+  modal: {
+    flex:1,
+    
+    
+    justifyContent:'center',
+    alignItems:'center',
+    
+   
+  },
+  modalWindow:{
+    height: 150,
+    width: "90%",
+    borderRadius: 25,
+    borderWidth: 2.5,
+    borderColor: "#4B3196",
+    backgroundColor:'white',
+    justifyContent:'space-around',
+    alignItems:'center',
+    padding:20
+  },
+  modalBtns:{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width:'80%'
+  },
+  vBtn:{
+    alignItems:'center',
+    width:'40%',
+    borderRadius: 15,
+    padding:10,
+    backgroundColor:'#AA8BD4',
+  },
+  cBtn:{
+    alignItems:'center',
+    width:'40%',
+    borderRadius: 15,
+    padding:10,
+    backgroundColor:'#4B3196',
+  }
+
 });

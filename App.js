@@ -73,8 +73,9 @@ const TabNavigator = () => {
           // paddingTop: 10,
           borderRadius: 50,
           width: "95%",
+          alignSelf: "center",
           height: 70,
-          marginHorizontal: 10,
+          marginHorizontal: 11,
           marginBottom: 20,
           
           // borderWidth: 2,
@@ -108,6 +109,7 @@ const TabNavigator = () => {
       <Tab.Screen name="Events" component={EventsScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
+      <Tab.Screen name="ProfilCreation" component={ProfileCreationScreen} />
     </Tab.Navigator>
   );
 };
