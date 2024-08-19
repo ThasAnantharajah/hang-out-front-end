@@ -47,7 +47,7 @@ const TabNavigator = () => {
           }
 
           return (
-            <View style={{ fle: 1 }}>
+            <View style={{ flex: 1 }}>
               <FontAwesome
                 name={iconName}
                 size={size}
