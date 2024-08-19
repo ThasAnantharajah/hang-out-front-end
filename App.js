@@ -14,6 +14,7 @@ import EventCreationScreen from "./screens/EventCreationScreen";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import signup from "./reducers/signup";
+import { faAlignJustify } from "@fortawesome/free-solid-svg-icons";
 
 const store = configureStore({
   reducer: { signup },
@@ -25,9 +26,6 @@ const Tab = createBottomTabNavigator();
 const TabNavigator = () => {
   return (
     <Tab.Navigator
-      //  tabBarStyle: [
-      //       {left:20, right: 20, borderRadius:15, backgroundColor:'#9660DA'}, null
-      //  ]
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName = "";
@@ -47,17 +45,40 @@ const TabNavigator = () => {
               break;
           }
 
-          return <FontAwesome name={iconName} size={size} color={color} />;
+          return (
+            <View style={{ flex: 1 }}>
+              <FontAwesome
+                name={iconName}
+                size={size}
+                color={color}
+                style={
+                  {
+                    // backgroundColor: "yellow",
+                    // textAlignVertical:'center',
+                    // textAlign:'center',
+                    // position:'absolute'
+                  }
+                }
+              />
+            </View>
+          );
         },
 
         tabBarStyle: {
-          flex: 1,
+          // flex:1,
+          // padding:0,
+          // flexDirection: "row",
+          // position: "absolute",
+          // alignItems: "center",
+          // justifyContent: "center",
+          // alignSelf: "center",
           backgroundColor: "white",
-          flexDirection: "row",
+          // paddingTop: 10,
           borderRadius: 50,
           width: "95%",
+          alignSelf: "center",
           height: 70,
-          marginHorizontal: 10,
+          marginHorizontal: 11,
           marginBottom: 20,
           position: "absolute",
           borderWidth: 2,
@@ -76,7 +97,6 @@ const TabNavigator = () => {
         },
         tabBarActiveTintColor: "#ec6e5b",
         tabBarInactiveTintColor: "#9660DA",
-
         headerShown: false,
       })}
     >
@@ -88,6 +108,7 @@ const TabNavigator = () => {
       <Tab.Screen name="Events" component={EventsScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
+      <Tab.Screen name="ProfilCreation" component={ProfileCreationScreen} />
     </Tab.Navigator>
   );
 };
@@ -96,7 +117,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={LoginScreen} />
+        {/* <Stack.Screen name="Home" component={LoginScreen} /> */}
         <Stack.Screen name="TabNavigator" component={TabNavigator} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen
@@ -112,10 +133,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  bottomTab: {
-    borderRadius: 50,
-    backgroundColor: "#9660DA",
-  },
-});

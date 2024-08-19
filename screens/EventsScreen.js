@@ -150,7 +150,7 @@ const EventsScreen = ({ navigation }) => {
               <View>
                 <Image
                   style={styles.img}
-                  source={require("../assets/bowling.jpg")}
+                  source={require("../assets/sports/Running-min.jpg")}
                 ></Image>
               </View>
               <View style={styles.card}>
