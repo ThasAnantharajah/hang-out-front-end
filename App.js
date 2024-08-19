@@ -10,6 +10,7 @@ import FriendsScreen from "./screens/FriendsScreen";
 import ProfileCreationScreen from "./screens/ProfileCreationScreen";
 
 import LoginScreen from "./screens/LoginScreen";
+import EventCreationScreen from "./screens/EventCreationScreen";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import signup from "./reducers/signup";
@@ -69,9 +70,9 @@ const TabNavigator = () => {
           shadowOffset: { width: 0, height: 10 },
           shadowRadius: 10,
           shadowOpacity: 0.3,
-          paddingTop:10,
-          alignSelf:'center',
-          gab:10,
+          paddingTop: 10,
+          alignSelf: "center",
+          gap: 10,
         },
         tabBarActiveTintColor: "#ec6e5b",
         tabBarInactiveTintColor: "#9660DA",
@@ -97,9 +98,15 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={LoginScreen} />
         <Stack.Screen name="TabNavigator" component={TabNavigator} />
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen
           name="ProfileCreationScreen"
           component={ProfileCreationScreen}
+        />
+        <Stack.Screen name="EventsScreen" component={EventsScreen} />
+        <Stack.Screen
+          name="EventCreationScreen"
+          component={EventCreationScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

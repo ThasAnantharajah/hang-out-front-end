@@ -11,16 +11,13 @@ import {
   Platform,
 } from "react-native";
 
+import EventCreationScreen from "./EventCreationScreen";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-
-const EventsScreen = () => {
-  
+const EventsScreen = ({ navigation }) => {
   return (
-
-    <View  style={styles.container}>
-      <SafeAreaView style={{backgroundColor:'#9660DA'}} />
+    <View style={styles.container}>
+      <SafeAreaView style={{ backgroundColor: "#9660DA" }} />
       <View style={styles.title}>
         <Text style={{ fontSize: 25, fontWeight: "bold", color: "white" }}>
           Événements
@@ -100,8 +97,30 @@ const EventsScreen = () => {
         </View>
 
         <View style={styles.eventTitle}>
-          <Text style={{ color: "white" }}>Événements</Text>
+          <Text
+            style={{ color: "#9660DA", fontSize: 25, fontWeight: "700" }}
+            onPress={() => navigation.navigate("EventCreationScreen")}
+          >
+            Événements
+          </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("EventCreationScreen")}
+          >
+            <View
+              style={{
+                height: 35,
+                width: 35,
+                backgroundColor: "#9660DA",
+                borderRadius: 50,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <FontAwesome name="calendar-plus-o" size={20} color="white" />
+            </View>
+          </TouchableOpacity>
         </View>
+
         <ScrollView style={{ width: "100%" }}>
           <View style={styles.eventSection}>
             <View
@@ -212,9 +231,8 @@ const EventsScreen = () => {
         </ScrollView>
       </View>
 
-      <SafeAreaView style={{backgroundColor:'white'}}/>
+      <SafeAreaView style={{ backgroundColor: "white" }} />
     </View>
-    
   );
 };
 
@@ -222,7 +240,7 @@ export default EventsScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
     paddingTop: Platform.OS === "android" ? 35 : 0,
     backgroundColor: "green",
   },
@@ -231,8 +249,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#9660DA",
     alignItems: "center",
     height: "5%",
-    
-   
   },
   mainContainer: {
     flex: 1,
@@ -242,7 +258,6 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     paddingRight: 28,
     paddingLeft: 28,
-    
   },
   searchSection: {
     flexDirection: "row",
@@ -266,15 +281,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   eventTitle: {
-    backgroundColor: "#4B3196",
-    borderRadius: 50,
-    paddingTop: 4,
-    paddingBottom: 4,
-    paddingRight: 14,
-    paddingLeft: 14,
-    marginTop: 15,
-    marginBottom: 15,
-    alignSelf: "center",
+    marginVertical: 20,
+    height: "5%",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   img: {
     height: 75,

@@ -14,6 +14,8 @@ import {
 import { Camera, CameraType } from "expo-camera/legacy";
 import { useEffect, useState, useRef } from "react";
 
+import * as ImagePicker from "expo-image-picker";
+
 import {
   SelectList,
   MultipleSelectList,
@@ -21,23 +23,66 @@ import {
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-const ProfileCreationScreen = () => {
+const ProfileCreationScreen = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(false);
   const [type, setType] = useState(CameraType.back);
 
-  const [selected, setSelected] = useState("");
+  const [image, setImage] = useState(null);
 
+  const [selected, setSelected] = useState("");
+  const [sportsList, setSportsList] = useState([]);
+  const [activitiesList, setActivitiesList] = useState([]);
   const data = [
     { key: "1", value: "Male" },
     { key: "2", value: "Female" },
     { key: "3", value: "Don't want to say" },
   ];
 
+  // const list = () => {
+  //   fetch("http://localhost:3000/sports")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log("test", data.sports);
+  //       setSportsList(data.sports);
+  //     });
+  // };
+
   let cameraRef = useRef(null);
 
   const takePicture = async () => {
     const photo = await cameraRef.takePictureAsync({ quality: 0.3 });
-    console.log(photo);
+    console.log("Photo:", photo);
+
+    const pickImage = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      // console.log("Result picker:", result.assets[0].uri);
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+      console.log(image);
+    };
+    /// upload
+    const formData = new FormData();
+
+    formData.append("photoFromFront", {
+      uri: photo,
+      name: "profilePicture.jpg",
+      type: "image/jpeg",
+    });
+
+    fetch("http://localhost:3000/upload", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        data.result && console.log(uploaded);
+      });
   };
 
   useEffect(() => {
@@ -46,7 +91,31 @@ const ProfileCreationScreen = () => {
       if (result) {
         setHasPermission(result.status === "granted");
       }
+
+      fetch("http://localhost:3000/activities")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("activities test", data);
+          let activityArray = data.activities.map((activity, i) => ({
+            key: i,
+            value: activity.name,
+          }));
+          console.log("activityArray:", activityArray);
+          setActivitiesList(activityArray);
+
+          fetch("http://localhost:3000/sports")
+            .then((res) => res.json())
+            .then((data) => {
+              let sportArray = data.sports.map((sport) => sport.name);
+              console.log("SportArray:", sportArray);
+              setSportsList(sportArray);
+            });
+        });
     })();
+
+    // others
+    // list();
+    // console.log("Liste des sports:", sportsList);
   }, []);
 
   return (
@@ -101,6 +170,18 @@ const ProfileCreationScreen = () => {
             </View>
           )}
         </View>
+
+        <View>
+          <Button
+            title="Pick an image from camera roll"
+            onPress={() => takePicture()}
+          />
+          {image && <Image source={{ uri: image }} />}
+          {/* <Image
+                  style={{ height: 50, width: 50 }}
+                  source={require("../assets/blank-profile.png")}
+                ></Image> */}
+        </View>
         <ScrollView style={{ width: "100%" }}>
           <View style={styles.inputContainer}>
             <Text
@@ -131,7 +212,7 @@ const ProfileCreationScreen = () => {
                 save="value"
                 placeholder="Gender"
                 searchPlaceholder="Gender"
-                search={false}
+                search={true}
                 dropdownStyles={{
                   height: 120,
                   borderWidth: "none",
@@ -185,29 +266,30 @@ const ProfileCreationScreen = () => {
             </Text>
 
             <MultipleSelectList
-              setSelected={(val) => setSelected(val)}
-              data={data}
+              setSelected={(activ) => setSelected(activ)}
+              data={activitiesList}
               save="value"
               onSelect={() => alert(selected)}
               label="Activities"
             />
 
             <MultipleSelectList
-              setSelected={(val) => setSelected(val)}
-              data={data}
+              setSelected={(spt) => setSelected(spt)}
+              data={sportsList}
               save="value"
+              boxStyles={{
+                flex: 1,
+                borderWidth: 1,
+                borderColor: "#9660DA",
+                borderRadius: 8,
+                padding: 5,
+                margin: 5,
+                height: 40,
+              }}
               onSelect={() => alert(selected)}
               label="Sports"
             />
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-              <View style={styles.rounded}>
-                <Text>Activités manuelles</Text>
-              </View>
-              <View style={styles.rounded}>
-                <Text>Tenis</Text>
-              </View>
-            </View>
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+            {/* <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
               <View
                 style={{
                   flex: 1,
@@ -226,6 +308,25 @@ const ProfileCreationScreen = () => {
                   borderColor: "#C8C8C8",
                 }}
               ></View>
+            </View> */}
+            <View style={styles.interest}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  marginBottom: 15,
+                  color: "#8F5CD1",
+                }}
+              >
+                Description
+              </Text>
+
+              <TextInput
+                placeholder="Name"
+                returnKeyType="next"
+                multiline={true}
+                style={styles.inputProfile}
+              ></TextInput>
             </View>
             <View
               style={{
@@ -235,10 +336,20 @@ const ProfileCreationScreen = () => {
                 justifyContent: "center",
               }}
             >
-              <TouchableOpacity style={styles.previousButton}>
+              <TouchableOpacity
+                style={styles.previousButton}
+                onPress={() => {
+                  navigation.navigate("LoginScreen");
+                }}
+              >
                 <Text style={styles.buttonText}>Previous</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.nextButton}>
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={() => {
+                  navigation.navigate("TabNavigator");
+                }}
+              >
                 <Text style={styles.buttonText}>Next</Text>
               </TouchableOpacity>
             </View>
