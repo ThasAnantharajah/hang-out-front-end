@@ -15,6 +15,7 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import signup from "./reducers/signup";
 import { faAlignJustify } from "@fortawesome/free-solid-svg-icons";
+import { faAlignJustify } from "@fortawesome/free-solid-svg-icons";
 
 const store = configureStore({
   reducer: { signup },
@@ -46,41 +47,33 @@ const TabNavigator = () => {
           }
 
           return (
-            <View style={{ flex: 1 }}>
+            <View style={{ fle: 1 }}>
               <FontAwesome
                 name={iconName}
                 size={size}
                 color={color}
-                style={
-                  {
-                    // backgroundColor: "yellow",
-                    // textAlignVertical:'center',
-                    // textAlign:'center',
-                    // position:'absolute'
-                  }
-                }
+                style={{
+                  backgroundColor: "yellow",
+                  position: "absolute",
+                }}
               />
             </View>
           );
         },
 
         tabBarStyle: {
-          // flex:1,
-          // padding:0,
-          // flexDirection: "row",
-          // position: "absolute",
-          // alignItems: "center",
-          // justifyContent: "center",
-          // alignSelf: "center",
+          flexDirection: "row",
+          position: "absolute",
+          alignItems: "center",
+          justifyContent: "space-between",
           backgroundColor: "white",
-          // paddingTop: 10,
+          paddingTop: 10,
           borderRadius: 50,
           width: "95%",
           alignSelf: "center",
           height: 70,
           marginHorizontal: 11,
           marginBottom: 20,
-          position: "absolute",
           borderWidth: 2,
           borderColor: "#9660DA",
           borderBottomWidth: 2,
@@ -91,9 +84,11 @@ const TabNavigator = () => {
           shadowOffset: { width: 0, height: 10 },
           shadowRadius: 10,
           shadowOpacity: 0.3,
-          paddingTop: 10,
-          alignSelf: "center",
-          gap: 10,
+        },
+        tabBarLabelStyle: {
+          color: "green",
+          backgroundColor: "black",
+          fontSize: "16",
         },
         tabBarActiveTintColor: "#ec6e5b",
         tabBarInactiveTintColor: "#9660DA",
