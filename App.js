@@ -25,7 +25,6 @@ const Tab = createBottomTabNavigator();
 const TabNavigator = () => {
   return (
     <Tab.Navigator
-    
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName = "";
@@ -46,49 +45,55 @@ const TabNavigator = () => {
           }
 
           return (
-            <View style={{fle:1}}>
-            <FontAwesome
-              name={iconName}
-              size={size}
-              color={color}
-              style={{
-                backgroundColor: "yellow",
-                position:'absolute'
-              }}
-            />
+            <View style={{ flex: 1 }}>
+              <FontAwesome
+                name={iconName}
+                size={size}
+                color={color}
+                style={{
+                  // backgroundColor: "yellow",
+                  // textAlignVertical:'center',
+                  // textAlign:'center',
+                  // position:'absolute'
+                }}
+              />
             </View>
           );
         },
 
         tabBarStyle: {
-          flexDirection: "row",
-          position: "absolute",
-          alignItems: "center",
-          justifyContent: "space-between",
+          // flex:1,
+          // padding:0,
+          // flexDirection: "row",
+          // position: "absolute",
+          // alignItems: "center",
+          // justifyContent: "center",
+          // alignSelf: "center",
           backgroundColor: "white",
-          paddingTop: 10,
+          // paddingTop: 10,
           borderRadius: 50,
           width: "95%",
           height: 70,
           marginHorizontal: 10,
           marginBottom: 20,
-          borderWidth: 2,
-          borderColor: "#9660DA",
-          borderBottomWidth: 2,
-          borderTopWidth: 2,
-          borderBottomColor: "#9660DA",
-          borderTopColor: "#9660DA",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 10 },
-          shadowRadius: 10,
-          shadowOpacity: 0.3,
+          
+          // borderWidth: 2,
+          // borderColor: "#9660DA",
+          // borderBottomWidth: 2,
+          // borderTopWidth: 2,
+          // borderBottomColor: "#9660DA",
+          // borderTopColor: "#9660DA",
+          // shadowColor: "#000",
+          // shadowOffset: { width: 0, height: 10 },
+          // shadowRadius: 10,
+          // shadowOpacity: 0.3,
         },
         tabBarLabelStyle: {
-          color:'green',
-          backgroundColor:'black',
-          fontSize:'16',
-         
-
+          color: "#9660DA",
+          fontWeight: "700",
+          fontSize: "16",
+          
+          
         },
         tabBarActiveTintColor: "#ec6e5b",
         tabBarInactiveTintColor: "#9660DA",
@@ -111,7 +116,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={LoginScreen} />
+        {/* <Stack.Screen name="Home" component={LoginScreen} /> */}
         <Stack.Screen name="TabNavigator" component={TabNavigator} />
         <Stack.Screen
           name="ProfileCreationScreen"
@@ -121,5 +126,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-
