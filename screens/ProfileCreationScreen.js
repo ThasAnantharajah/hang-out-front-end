@@ -9,10 +9,13 @@ import {
   Image,
   Platform,
   TextInput,
+  Modal,
   Button,
 } from "react-native";
-import { Camera, CameraType } from "expo-camera/legacy";
+import { Camera, CameraType, FlashMode} from "expo-camera/legacy";
 import { useEffect, useState, useRef } from "react";
+import { useIsFocused } from "@react-navigation/native";
+import { BACK_END_URL } from "../config";
 
 import * as ImagePicker from "expo-image-picker";
 
@@ -24,14 +27,19 @@ import {
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const ProfileCreationScreen = ({ navigation }) => {
+  const isFocused = useIsFocused();
   const [hasPermission, setHasPermission] = useState(false);
   const [type, setType] = useState(CameraType.back);
+  const [flashMode, setFlashMode] = useState(FlashMode.off);
+  const [showCamera, setShowCamera] = useState(false)
+  const [showModal, setShowModal] = useState(false);
 
   const [image, setImage] = useState(null);
 
   const [selected, setSelected] = useState("");
   const [sportsList, setSportsList] = useState([]);
   const [activitiesList, setActivitiesList] = useState([]);
+  const [imgGallery, setImgGallery] = useState("");
   const data = [
     { key: "1", value: "Male" },
     { key: "2", value: "Female" },
@@ -49,41 +57,122 @@ const ProfileCreationScreen = ({ navigation }) => {
 
   let cameraRef = useRef(null);
 
-  const takePicture = async () => {
-    const photo = await cameraRef.takePictureAsync({ quality: 0.3 });
-    console.log("Photo:", photo);
+  
 
-    const pickImage = async () => {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-      // console.log("Result picker:", result.assets[0].uri);
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-      }
-      console.log(image);
-    };
-    /// upload
-    const formData = new FormData();
-
-    formData.append("photoFromFront", {
-      uri: photo,
-      name: "profilePicture.jpg",
-      type: "image/jpeg",
+  const handleImgPicker = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
 
-    fetch("http://localhost:3000/upload", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        data.result && console.log(uploaded);
-      });
+    // if (!result.canceled) {
+    //   setImgGallery(result.assets[0].uri);
+    // }
   };
+
+  const takePicture = async () => {
+    const photo = await cameraRef.takePictureAsync({ quality: 0.3 });
+    // console.log("Photo:", photo);
+
+    if (photo) {
+      const formData = new FormData();
+
+      formData.append("photoFromFront", {
+        uri: photo.uri,
+        name: "profilePicture.jpg",
+        type: "image/jpeg",
+      });
+
+      fetch("BACK_END_URL/upload", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          data.result && console.log(uploaded);
+        });
+    }
+  };
+
+
+ const handleCamera = () => {
+  setShowCamera(!showCamera)
+  setShowModal(true);
+ 
+ }
+
+
+
+
+
+  
+
+  // if (!hasPermission || !isFocused) {
+  //   return <View />;
+  // }
+
+  // return (
+  //   <Camera
+  //     type={type}
+  //     flashMode={flashMode}
+  //     ref={(ref: any) => (cameraRef = ref)}
+  //     style={styles.camera}
+  //   >
+  //     <View style={styles.buttonsContainer}>
+  //       <TouchableOpacity
+  //         onPress={() =>
+  //           setType(
+  //             type === CameraType.back ? CameraType.front : CameraType.back
+  //           )
+  //         }
+  //         style={styles.button}
+  //       >
+  //         <FontAwesome name="rotate-right" size={25} color="#ffffff" />
+  //       </TouchableOpacity>
+
+  //       <TouchableOpacity
+  //         onPress={() =>
+  //           setFlashMode(
+  //             flashMode === FlashMode.off ? FlashMode.torch : FlashMode.off
+  //           )
+  //         }
+  //         style={styles.button}
+  //       >
+  //         <FontAwesome
+  //           name="flash"
+  //           size={25}
+  //           color={flashMode === FlashMode.off ? "#ffffff" : "#e8be4b"}
+  //         />
+  //       </TouchableOpacity>
+  //     </View>
+
+  //     <View style={styles.snapContainer}>
+  //       <TouchableOpacity onPress={() => cameraRef && takePicture()}>
+  //         <FontAwesome 
+  //         name="circle-thin" 
+  //         size={95} 
+  //         color="#ffffff" />
+  //       </TouchableOpacity>
+  //     </View>
+  //   </Camera>
+  // );
+
+  // const pickImage = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+  //   // console.log("Result picker:", result.assets[0].uri);
+  //   if (!result.canceled) {
+  //     setImage(result.assets[0].uri);
+  //   }
+  //   console.log(image);
+  // };
+
 
   useEffect(() => {
     (async () => {
@@ -92,7 +181,7 @@ const ProfileCreationScreen = ({ navigation }) => {
         setHasPermission(result.status === "granted");
       }
 
-      fetch("http://localhost:3000/activities")
+      fetch(" BACK_END_URL/activities")
         .then((res) => res.json())
         .then((data) => {
           console.log("activities test", data);
@@ -103,7 +192,7 @@ const ProfileCreationScreen = ({ navigation }) => {
           console.log("activityArray:", activityArray);
           setActivitiesList(activityArray);
 
-          fetch("http://localhost:3000/sports")
+          fetch(" BACK_END_URL/sports")
             .then((res) => res.json())
             .then((data) => {
               let sportArray = data.sports.map((sport) => sport.name);
@@ -111,15 +200,70 @@ const ProfileCreationScreen = ({ navigation }) => {
               setSportsList(sportArray);
             });
         });
-    })();
 
-    // others
-    // list();
-    // console.log("Liste des sports:", sportsList);
+    others
+    list();
+    console.log("Liste des sports:", sportsList);
   }, []);
 
   return (
+    
     <SafeAreaView style={styles.container}>
+      {showCamera && 
+        <Modal  transparent visible={showModal} animationType="slide" style={{flex:1, backgroundColor:'white', justifyContent:'center', alignContent:'center', alignItems:'center'}}  >
+          <View style={{flex:1, justifyContent:'center', backgroundColor:'#8F5CD1'}}>
+          <Camera
+      type={type}
+      flashMode={flashMode}
+      ref={(ref: any) => (cameraRef = ref)}
+      style={{width:'100%', height:'35%'}}
+    >
+      
+    </Camera>
+    <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          onPress={() =>
+            setType(
+              type === CameraType.back ? CameraType.front : CameraType.back
+            )
+          }
+          style={styles.button}
+        >
+          <FontAwesome name="refresh" size={25} color="#ffffff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            setFlashMode(
+              flashMode === FlashMode.off ? FlashMode.torch : FlashMode.off
+            )
+          }
+          style={styles.button}
+        >
+          <FontAwesome
+            name="flash"
+            size={25}
+            color={flashMode === FlashMode.off ? "#ffffff" : "#e8be4b"}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.snapContainer}>
+        <TouchableOpacity onPress={() => cameraRef && takePicture()}>
+          <FontAwesome 
+          name="circle-thin" 
+          size={95} 
+          color="#ffffff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.cBtn}
+              onPress={()=>{setShowModal(false)}}>
+                <Text style={{color:'#8F5CD1', fontWeight:'bold'}}>Annuler</Text>
+              </TouchableOpacity>
+      </View>
+    </View>
+    </Modal>
+    }
       <View style={styles.title}>
         <Text style={{ fontSize: 25, fontWeight: "bold", color: "white" }}>
           Profile Creation (1/2)
@@ -127,7 +271,18 @@ const ProfileCreationScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.profilContainer}>
+        
         <View style={{ width: "100%", height: "35%" }}>
+           <Image
+            style={styles.camera}
+            source={require("../assets/blank-profile.png")}
+          ></Image>
+        </View>
+        
+        
+        
+        
+        {/* <View style={{ width: "100%", height: "35%" }}>
           {hasPermission ? (
             <Camera
               style={styles.camera}
@@ -146,42 +301,74 @@ const ProfileCreationScreen = ({ navigation }) => {
                   marginBottom: 15,
                   alignItems: "center",
                 }}
-              >
-                <View
-                  style={{
-                    justifyContent: "center",
-                    marginBottom: 15,
-                    alignItems: "center",
-                    backgroundColor: "white",
-                    borderRadius: 25,
-                    height: 40,
-                    width: 40,
-                  }}
-                >
-                  <TouchableOpacity title="Flip" onPress={() => takePicture()}>
-                    <FontAwesome name="camera" size={25} color="#8F5CD1" />
-                  </TouchableOpacity>
-                </View>
-              </View>
+              ></View>
             </Camera>
           ) : (
             <View>
               <Text>No camera permission.</Text>
             </View>
           )}
-        </View>
+        </View> */}
 
-        <View>
+        <View
+          style={{
+            flexDirection: "row",
+            marginTop: 20,
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "40%",
+          }}
+        >
+          <View>
+            <View
+              style={{
+                justifyContent: "center",
+                marginBottom: 15,
+                alignItems: "center",
+                backgroundColor: "#8F5CD1",
+                borderRadius: 25,
+                height: 50,
+                width: 50,
+              }}
+            >
+              <TouchableOpacity title="Flip" onPress={() => handleCamera()}>
+                <FontAwesome name="camera" size={25} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={{ color: "#8F5CD1", fontWeight: "700" }}>Camera</Text>
+          </View>
+
+          <View>
+            <View
+              style={{
+                justifyContent: "center",
+                marginBottom: 15,
+                alignItems: "center",
+                backgroundColor: "#8F5CD1",
+                borderRadius: 25,
+                height: 50,
+                width: 50,
+              }}
+            >
+              <TouchableOpacity title="Flip" onPress={() => handleImgPicker()}>
+                <FontAwesome name="th-large" size={25} color="white" />
+              </TouchableOpacity>
+            </View>
+            <Text style={{ color: "#8F5CD1", fontWeight: "700" }}>Gallery</Text>
+          </View>
+        </View>
+        {/* <View>
           <Button
             title="Pick an image from camera roll"
-            onPress={() => takePicture()}
+            onPress={() => handleImgPicker()}
           />
           {image && <Image source={{ uri: image }} />}
-          {/* <Image
+          <Image
                   style={{ height: 50, width: 50 }}
                   source={require("../assets/blank-profile.png")}
-                ></Image> */}
-        </View>
+                ></Image>
+        </View> */}
         <ScrollView style={{ width: "100%" }}>
           <View style={styles.inputContainer}>
             <Text
@@ -468,4 +655,32 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
   },
+  buttonsContainer: {
+    flex: 0.1,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    paddingTop: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+  button: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    borderRadius: 50,
+  },
+    snapContainer: {
+    alignItems: "center",
+  },
+  cBtn:{
+    alignItems:'center',
+    width:'40%',
+    borderRadius: 15,
+    padding:10,
+    backgroundColor:'white',
+    marginTop:20
+  }
 });

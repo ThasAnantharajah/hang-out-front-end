@@ -123,7 +123,7 @@ const EventsScreen = ({ navigation }) => {
 
         <ScrollView style={{ width: "100%" }}>
           <View style={styles.eventSection}>
-            <View
+            {/* <View
               style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
             >
               <View>
@@ -142,9 +142,9 @@ const EventsScreen = ({ navigation }) => {
                   <Text>VOIR</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
 
-            <View
+            {/* <View
               style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
             >
               <View>
@@ -163,9 +163,9 @@ const EventsScreen = ({ navigation }) => {
                   <Text>VOIR</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
 
-            <View
+            {/* <View
               style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
             >
               <View>
@@ -184,9 +184,9 @@ const EventsScreen = ({ navigation }) => {
                   <Text>VOIR</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
 
-            <View
+            {/* <View
               style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
             >
               <View>
@@ -205,25 +205,92 @@ const EventsScreen = ({ navigation }) => {
                   <Text>VOIR</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
 
             <View
-              style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
+              style={{ flexDirection: "row", width: "100%", justifyContent:'space-between', alignContent:'space-between',marginBottom: 20, borderWidth:2, borderColor:'#9660DA', borderRadius: 15, padding:10
+          }}
             >
               <View>
                 <Image
-                  style={styles.img}
-                  source={require("../assets/bowling.jpg")}
+                  style={styles.imgtest}
+                  source={require("../assets/sports/Golf-min.jpg")}
                 ></Image>
               </View>
-              <View style={styles.card}>
+              <View style={styles.cardtest}>
                 <View>
                   <Text>Bowling (03/12/2024) </Text>
                   <Text>Heur : 20h30 - 22h30</Text>
                   <Text>Participants: 6/10</Text>
                 </View>
-                <TouchableOpacity style={styles.btn}>
-                  <Text>VOIR</Text>
+                <TouchableOpacity style={styles.btntest}>
+                  <Text style={{color:'white'}}>VOIR</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View
+              style={{ flexDirection: "row", width: "100%", justifyContent:'space-between', alignContent:'space-between',marginBottom: 20, borderWidth:2, borderColor:'#9660DA', borderRadius: 15, padding:10
+          }}
+            >
+              <View>
+                <Image
+                  style={styles.imgtest}
+                  source={require("../assets/sports/Golf-min.jpg")}
+                ></Image>
+              </View>
+              <View style={styles.cardtest}>
+                <View>
+                  <Text>Bowling (03/12/2024) </Text>
+                  <Text>Heur : 20h30 - 22h30</Text>
+                  <Text>Participants: 6/10</Text>
+                </View>
+                <TouchableOpacity style={styles.btntest}>
+                  <Text style={{color:'white'}}>VOIR</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View
+              style={{ flexDirection: "row", width: "100%", justifyContent:'space-between', alignContent:'space-between',marginBottom: 20, borderWidth:2, borderColor:'#9660DA', borderRadius: 15, padding:10
+          }}
+            >
+              <View>
+                <Image
+                  style={styles.imgtest}
+                  source={require("../assets/sports/Golf-min.jpg")}
+                ></Image>
+              </View>
+              <View style={styles.cardtest}>
+                <View>
+                  <Text>Bowling (03/12/2024) </Text>
+                  <Text>Heur : 20h30 - 22h30</Text>
+                  <Text>Participants: 6/10</Text>
+                </View>
+                <TouchableOpacity style={styles.btntest}>
+                  <Text style={{color:'white'}}>VOIR</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View
+              style={{ flexDirection: "row", width: "100%", justifyContent:'space-between', backgroundColor: "#E5E4E2",alignContent:'space-between',marginBottom: 20, borderWidth:2, borderColor:'#9660DA', borderRadius: 15, padding:10
+          }}
+            >
+              <View>
+                <Image
+                  style={styles.imgtest}
+                  source={require("../assets/sports/Golf-min.jpg")}
+                ></Image>
+              </View>
+              <View style={styles.cardtest}>
+                <View>
+                  <Text>Bowling (03/12/2024) </Text>
+                  <Text>Heur : 20h30 - 22h30</Text>
+                  <Text>Participants: 6/10</Text>
+                </View>
+                <TouchableOpacity style={styles.btntest}>
+                  <Text style={{color:'white'}}>VOIR</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -315,4 +382,29 @@ const styles = StyleSheet.create({
     paddingLeft: 14,
     borderRadius: 25,
   },
+  imgtest:{
+    borderRadius: 50,
+    height: 90,
+    width: 90,
+    borderWidth:1, 
+    borderColor:'#9660DA'
+  },
+  cardtest:{
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",  
+    paddingTop: 2,
+    paddingBottom: 2,
+   
+    paddingLeft: 14,
+  },
+  btntest : {
+    backgroundColor: "#9660DA",
+    paddingTop: 4,
+    paddingBottom: 4,
+    paddingRight: 14,
+    paddingLeft: 14,
+    borderRadius: 25,
+  }
 });

@@ -21,8 +21,8 @@ import {
 
 // import EventsScreen from "./EventsScreen";
 
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import DateTimePicker from "@react-native-community/datetimepicker";
+// import FontAwesome from "@expo/vector-icons/FontAwesome";
+// import DateTimePicker from "@react-native-community/datetimepicker";
 
 const EventCreationScreen = ({ navigation }) => {
   const [eventName, setEventName] = useState("");
@@ -30,7 +30,7 @@ const EventCreationScreen = ({ navigation }) => {
   const [eventAddress, setEventAddress] = useState("");
   const [eventCity, setEventCity] = useState("");
   const [eventSport, setEventSport] = useState("");
-  const [eventActivity, setEventActivity] = useState("");
+  // const [eventActivity, setEventActivity] = useState("");
   const [eventSlots, setEventSlots] = useState(0);
 
   const [date, setDate] = useState(new Date(1598051730000));

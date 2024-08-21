@@ -14,6 +14,7 @@ import EventCreationScreen from "./screens/EventCreationScreen";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import signup from "./reducers/signup";
+import { beginAsyncEvent } from "react-native/Libraries/Performance/Systrace";
 
 const store = configureStore({
   reducer: { signup },
@@ -47,19 +48,19 @@ const TabNavigator = () => {
               break;
           }
 
-          return <FontAwesome name={iconName} size={size} color={color} />;
+          return <FontAwesome name={iconName} size={size} color={color} style={{backgroundColor:'white', height:30 }} />;
         },
 
         tabBarStyle: {
           flex: 1,
-          backgroundColor: "white",
+          backgroundColor: "red",
           flexDirection: "row",
           borderRadius: 50,
           width: "95%",
           height: 70,
+          position:'absolute',
           marginHorizontal: 10,
           marginBottom: 20,
-          position: "absolute",
           borderWidth: 2,
           borderColor: "#9660DA",
           borderBottomWidth: 2,
@@ -70,20 +71,21 @@ const TabNavigator = () => {
           shadowOffset: { width: 0, height: 10 },
           shadowRadius: 10,
           shadowOpacity: 0.3,
-          paddingTop: 10,
-          alignSelf: "center",
-          gap: 10,
+          alignItems:'flex-end',
+          padding:0,
         },
         tabBarActiveTintColor: "#ec6e5b",
         tabBarInactiveTintColor: "#9660DA",
-
         headerShown: false,
+        tabBarShowLabel :false
+          
+        
       })}
     >
       <Tab.Screen
         name="Friends"
         component={FriendsScreen}
-        options={{ tabBarBadge: 3 }}
+        // options={{ tabBarBadge: 3 }}
       />
       <Tab.Screen name="Events" component={EventsScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
@@ -96,18 +98,18 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={LoginScreen} />
-        <Stack.Screen name="TabNavigator" component={TabNavigator} />
-        <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        {/* <Stack.Screen name="Home" component={LoginScreen} /> */}
+        {/* <Stack.Screen name="TabNavigator" component={TabNavigator} /> */}
+        {/* <Stack.Screen name="LoginScreen" component={LoginScreen} /> */}
         <Stack.Screen
           name="ProfileCreationScreen"
           component={ProfileCreationScreen}
         />
         <Stack.Screen name="EventsScreen" component={EventsScreen} />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="EventCreationScreen"
           component={EventCreationScreen}
-        />
+        /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
