@@ -17,7 +17,7 @@ const FriendsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Modal  transparent visible={showModal} animationType="slide"  >
+      <Modal transparent visible={showModal} animationType="slide">
         <View style={styles.modal}>
           <View style={styles.modalWindow}>
             <Text style={styles.modalText}> Confirmez-vous supression ? </Text>
@@ -25,11 +25,19 @@ const FriendsScreen = () => {
 
             <View style={styles.modalBtns}>
               <TouchableOpacity style={styles.vBtn}>
-                <Text style={{color:'white', fontWeight:'bold'}}>Confirmer</Text>
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  Confirmer
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cBtn}
-              onPress={()=>{setShowModal(false)}}>
-                <Text style={{color:'white', fontWeight:'bold'}}>Annuler</Text>
+              <TouchableOpacity
+                style={styles.cBtn}
+                onPress={() => {
+                  setShowModal(false);
+                }}
+              >
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  Annuler
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -200,7 +208,7 @@ const FriendsScreen = () => {
         <Text
           style={{ fontStyle: "italic", textAlign: "center", color: "grey" }}
         >
-          Qui dit nouvelles sortie ...{"\n"} dit nouveaux amis !{"\n"}😊
+          Qui dit nouvelles sorties ...{"\n"} dit de nouveaux amis !{"\n"}😊
         </Text>
       </View>
     </SafeAreaView>
@@ -294,43 +302,39 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   modal: {
-    flex:1,
-    
-    
-    justifyContent:'center',
-    alignItems:'center',
-    
-   
+    flex: 1,
+
+    justifyContent: "center",
+    alignItems: "center",
   },
-  modalWindow:{
+  modalWindow: {
     height: 150,
     width: "90%",
     borderRadius: 25,
     borderWidth: 2.5,
     borderColor: "#4B3196",
-    backgroundColor:'white',
-    justifyContent:'space-around',
-    alignItems:'center',
-    padding:20
+    backgroundColor: "white",
+    justifyContent: "space-around",
+    alignItems: "center",
+    padding: 20,
   },
-  modalBtns:{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width:'80%'
+  modalBtns: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
   },
-  vBtn:{
-    alignItems:'center',
-    width:'40%',
+  vBtn: {
+    alignItems: "center",
+    width: "40%",
     borderRadius: 15,
-    padding:10,
-    backgroundColor:'#AA8BD4',
+    padding: 10,
+    backgroundColor: "#AA8BD4",
   },
-  cBtn:{
-    alignItems:'center',
-    width:'40%',
+  cBtn: {
+    alignItems: "center",
+    width: "40%",
     borderRadius: 15,
-    padding:10,
-    backgroundColor:'#4B3196',
-  }
-
+    padding: 10,
+    backgroundColor: "#4B3196",
+  },
 });

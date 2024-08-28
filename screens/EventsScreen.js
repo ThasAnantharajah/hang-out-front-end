@@ -13,14 +13,55 @@ import {
 
 import EventCreationScreen from "./EventCreationScreen";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const EventsScreen = ({ navigation }) => {
+  //  search inputs
+  const [activityInput, setActivityInput] = useState("");
+  const [cityInput, setCityInput] = useState("");
+  const [regionInput, setRegionInput] = useState("");
+  const [dayInput, setDayInput] = useState("");
+  const [startInput, setStartInput] = useState("");
+  const [endInput, setEndInput] = useState([]);
+
+  const registeredUsers = 5;
+  // data treated
+  const [eventData, setEventData] = useState();
+
+  const handleSearch = () => {
+    // MAE WORKING ON
+    // const queryParams = new URLSearchParams();
+
+    // if (activityInput) queryParams.append("activityInput", activityInput);
+    // if (cityInput) queryParams.append("cityInput", cityInput);
+    // if (regionInput) queryParams.append("regionInput", regionInput);
+    // if (dayInput) queryParams.append("dayInput", dayInput);
+    // if (startInput) queryParams.append("startInput", startInput);
+    // if (endInput) queryParams.append("endInput", endInput);
+
+    fetch(`http://localhost:3000/events/search`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("SEARCH RESULTS:", data);
+        console.log("SEARCH RESULTS LENGTH:", data.events.length);
+        setEventData(data.events);
+        console.log("EVENT DATA:", eventData);
+      });
+  };
+
+  const displayDate = (date) => {
+    const day = String(date.getDate()).padStart(2, "0"); // Day of the month (1-31)
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed in JavaScript, so add 1
+    const year = String(date.getFullYear()).slice(-2); // Get the last two digits of the year
+
+    return `${day}/${month}/${year}`;
+  };
   return (
     <View style={styles.container}>
-      <SafeAreaView style={{ backgroundColor: "#9660DA" }} />
+      <SafeAreaView style={{ backgroundColor: "#4B3196" }} />
       <View style={styles.title}>
-        <Text style={{ fontSize: 25, fontWeight: "bold", color: "white" }}>
-          Événements
+        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+          Events
         </Text>
       </View>
 
@@ -34,9 +75,10 @@ const EventsScreen = ({ navigation }) => {
           >
             <TextInput
               style={styles.boxRadius}
-              placeholder="Type d'activité..."
-              //   value={type}
-              // onChangeText={(text) => setType(text)}
+              placeholder="Activity..."
+              placeholderTextColor={"#767577"}
+              value={activityInput}
+              onChangeText={(text) => setActivityInput(text)}
             />
             <FontAwesome style={styles.fontAwesome} name="search" />
           </View>
@@ -44,9 +86,10 @@ const EventsScreen = ({ navigation }) => {
           <View style={{ width: "30%" }}>
             <TextInput
               style={styles.boxRadius}
-              placeholder="Ville..."
-              //   value={city}
-              // onChangeText={(text) => setCity(text)}
+              placeholder="City..."
+              placeholderTextColor={"#767577"}
+              value={cityInput}
+              onChangeText={(text) => setCityInput(text)}
             />
           </View>
 
@@ -54,6 +97,8 @@ const EventsScreen = ({ navigation }) => {
             <TextInput
               style={styles.boxRadius}
               placeholder="Km..."
+              // placeholderTextColor={"#767577"}
+
               //   value={milles}
               // onChangeText={(text) => setMilles(text)}
             />
@@ -62,38 +107,64 @@ const EventsScreen = ({ navigation }) => {
           <View style={{ width: "40%" }}>
             <TextInput
               style={styles.boxRadius}
-              placeholder="Département..."
-              //   value={departement}
-              // onChangeText={(text) => setDepartement(text)}
+              placeholder="Region..."
+              placeholderTextColor={"#767577"}
+              value={regionInput}
+              onChangeText={(text) => setRegionInput(text)}
             />
           </View>
 
           <View style={{ width: "30%" }}>
             <TextInput
               style={styles.boxRadius}
-              placeholder="Jour..."
-              //   value={day}
-              // onChangeText={(text) => setDay(text)}
+              placeholder="Day..."
+              placeholderTextColor={"#767577"}
+              value={dayInput}
+              onChangeText={(text) => setDayInput(text)}
             />
           </View>
 
           <View style={{ width: "30%" }}>
             <TextInput
               style={styles.boxRadius}
-              placeholder="Du..."
-              //   value={start}
-              // onChangeText={(text) => setStart(text)}
+              placeholder="From..."
+              placeholderTextColor={"#767577"}
+              value={startInput}
+              onChangeText={(text) => setStartInput(text)}
             />
           </View>
 
           <View style={{ width: "30%" }}>
             <TextInput
               style={styles.boxRadius}
-              placeholder="Au.."
-              //   value={end}
-              // onChangeText={(text) => setEnd(text)}
+              placeholder="To..."
+              placeholderTextColor={"#767577"}
+              value={endInput}
+              onChangeText={(text) => setEndInput(text)}
             />
           </View>
+        </View>
+
+        <View
+          style={{
+            marginTop: 15,
+            justifyContent: "center",
+            width: "40%",
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#9660DA",
+              borderRadius: 8,
+              padding: 10,
+              alignItems: "center",
+            }}
+            onPress={() => handleSearch()}
+          >
+            <Text style={{ color: "white", fontSize: 15, fontWeight: "600" }}>
+              Search
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.eventTitle}>
@@ -123,109 +194,78 @@ const EventsScreen = ({ navigation }) => {
 
         <ScrollView style={{ width: "100%" }}>
           <View style={styles.eventSection}>
-            <View
-              style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
-            >
-              <View>
-                <Image
-                  style={styles.img}
-                  source={require("../assets/bowling.jpg")}
-                ></Image>
-              </View>
-              <View style={styles.card}>
-                <View>
-                  <Text>Bowling (03/12/2024) </Text>
-                  <Text>Heur : 20h30 - 22h30</Text>
-                  <Text>Participants: 6/10</Text>
-                </View>
-                <TouchableOpacity style={styles.btn}>
-                  <Text>VOIR</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            {eventData ? (
+              eventData.map((event, i) => (
+                <View
+                  key={i}
+                  style={{
+                    flexDirection: "row",
+                    width: "100%",
+                    marginBottom: 20,
+                  }}
+                >
+                  <View>
+                    <Image
+                      style={styles.img}
+                      source={require("../assets/activities/Bowling-min.jpg")} // Replace with event image URL
+                    />
+                  </View>
+                  <View style={styles.card}>
+                    <View>
+                      <Text>
+                        {event.name} ({displayDate(new Date(event.date))})
+                      </Text>
 
-            <View
-              style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
-            >
-              <View>
-                <Image
-                  style={styles.img}
-                  source={require("../assets/sports/Running-min.jpg")}
-                ></Image>
-              </View>
-              <View style={styles.card}>
-                <View>
-                  <Text>Bowling (03/12/2024) </Text>
-                  <Text>Heur : 20h30 - 22h30</Text>
-                  <Text>Participants: 6/10</Text>
+                      <Text>
+                        Time: {event.startTime}-{event.endTime}
+                      </Text>
+                      <Text>
+                        Participants: {registeredUsers}/{event.slots}
+                      </Text>
+                    </View>
+                    <TouchableOpacity style={styles.btn}>
+                      <Text>VOIR</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <TouchableOpacity style={styles.btn}>
-                  <Text>VOIR</Text>
-                </TouchableOpacity>
+              ))
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                  marginBottom: 15,
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: 500,
+                    fontStyle: "italic",
+                    color: "grey",
+                  }}
+                >
+                  No events found, make a new search !
+                </Text>
               </View>
+            )}
+          </View>
+          <View
+            style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
+          >
+            <View>
+              <Image
+                style={styles.img}
+                source={require("../assets/activities/Bowling-min.jpg")}
+              ></Image>
             </View>
-
-            <View
-              style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
-            >
+            <View style={styles.card}>
               <View>
-                <Image
-                  style={styles.img}
-                  source={require("../assets/bowling.jpg")}
-                ></Image>
+                <Text>Bowling (03/12/2024) </Text>
+                <Text>Heur : 20h30 - 22h30</Text>
+                <Text>Participants: 6/10</Text>
               </View>
-              <View style={styles.card}>
-                <View>
-                  <Text>Bowling (03/12/2024) </Text>
-                  <Text>Heur : 20h30 - 22h30</Text>
-                  <Text>Participants: 6/10</Text>
-                </View>
-                <TouchableOpacity style={styles.btn}>
-                  <Text>VOIR</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View
-              style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
-            >
-              <View>
-                <Image
-                  style={styles.img}
-                  source={require("../assets/bowling.jpg")}
-                ></Image>
-              </View>
-              <View style={styles.card}>
-                <View>
-                  <Text>Bowling (03/12/2024) </Text>
-                  <Text>Heur : 20h30 - 22h30</Text>
-                  <Text>Participants: 6/10</Text>
-                </View>
-                <TouchableOpacity style={styles.btn}>
-                  <Text>VOIR</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View
-              style={{ flexDirection: "row", width: "100%", marginBottom: 20 }}
-            >
-              <View>
-                <Image
-                  style={styles.img}
-                  source={require("../assets/bowling.jpg")}
-                ></Image>
-              </View>
-              <View style={styles.card}>
-                <View>
-                  <Text>Bowling (03/12/2024) </Text>
-                  <Text>Heur : 20h30 - 22h30</Text>
-                  <Text>Participants: 6/10</Text>
-                </View>
-                <TouchableOpacity style={styles.btn}>
-                  <Text>VOIR</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity style={styles.btn}>
+                <Text>VOIR</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
@@ -242,13 +282,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: Platform.OS === "android" ? 35 : 0,
-    backgroundColor: "green",
   },
   title: {
     width: "100%",
-    backgroundColor: "#9660DA",
+    backgroundColor: "#4B3196",
     alignItems: "center",
-    height: "5%",
+    paddingBottom: 10,
   },
   mainContainer: {
     flex: 1,
@@ -266,18 +305,27 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   boxRadius: {
-    backgroundColor: "#D8D8D8",
+    backgroundColor: "#fff",
     borderRadius: 50,
     paddingTop: 8,
     paddingBottom: 8,
+    marginBottom: 8,
     paddingRight: 14,
     paddingLeft: 14,
+
+    borderWidth: 0.5,
+    borderColor: "#D8D8D8",
+
+    shadowColor: "#D8D8D8",
+    shadowOffset: { width: -1, height: 3 },
+    shadowOpacity: 0.6,
+    shadowRadius: 2,
   },
   fontAwesome: {
     position: "absolute",
     fontSize: 15,
     color: "grey",
-    marginLeft: 315,
+    marginLeft: 300,
     marginTop: 10,
   },
   eventTitle: {
@@ -293,19 +341,29 @@ const styles = StyleSheet.create({
     width: 69,
     borderTopLeftRadius: 25,
     borderBottomLeftRadius: 25,
+
+    shadowColor: "#D8D8D8",
+    shadowOffset: { width: -1, height: 3 },
+    shadowOpacity: 0.6,
+    shadowRadius: 2,
   },
   card: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#D8D8D8",
+    backgroundColor: "#fff",
     paddingTop: 2,
     paddingBottom: 2,
     paddingRight: 14,
     paddingLeft: 14,
     borderTopRightRadius: 25,
     borderBottomRightRadius: 25,
+
+    shadowColor: "#D8D8D8",
+    shadowOffset: { width: -1, height: 5 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
   },
   btn: {
     backgroundColor: "#D990A1",

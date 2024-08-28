@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -15,13 +15,29 @@ import {
   CalendarList,
   Agenda,
   LocaleConfig,
+  ExpandableCalendar,
 } from "react-native-calendars";
 
 const CalendarScreen = () => {
+  const [clickedDate, setClickedDate] = useState();
+  const [selected, setSelected] = useState("");
+  const [eventDates, setEventDates] = useState("");
+
+  const retrieveDayEvents = () => {
+    fetch("http://localhost:3000/events/search")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("SEARCH RESULTS:", data);
+        console.log("SEARCH RESULTS LENGTH:", data.events.length);
+        setEventData(data.events);
+        console.log("EVENT DATA:", eventData);
+      });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.title}>
-        <Text style={{ fontSize: 25, fontWeight: "bold", color: "white" }}>
+        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
           Calendrier
         </Text>
       </View>
@@ -29,16 +45,68 @@ const CalendarScreen = () => {
       <View style={styles.mainContainer}>
         <View
           style={{
-            width: "100%",
-            borderWidth: 2,
-            borderColor: "#9660DA",
-            borderRadius: 5,
+            width: "110%",
           }}
         >
-          <Calendar></Calendar>
+          <Calendar
+            firstDay={1}
+            markingType={"multi-dot"}
+            theme={{
+              backgroundColor: "#ffffff",
+              calendarBackground: "#ffffff",
+              textSectionTitleColor: "#b6c1cd",
+              textSectionTitleDisabledColor: "#d9e1e8",
+              selectedDayBackgroundColor: "#9660DA",
+              selectedDayTextColor: "#ffffff",
+              todayTextColor: "#9660DA",
+              dayTextColor: "#2d4150",
+              textDisabledColor: "#d9e1e8",
+              dotColor: "#9660DA",
+              selectedDotColor: "#ffffff",
+              arrowColor: "#9660DA",
+              disabledArrowColor: "#d9e1e8",
+              monthTextColor: "#9660DA",
+              indicatorColor: "blue",
+              textDayFontFamily: "monospace",
+              textMonthFontFamily: "monospace",
+              textDayHeaderFontFamily: "monospace",
+              textDayFontWeight: "300",
+              textMonthFontWeight: "bold",
+              textDayHeaderFontWeight: "300",
+              textDayFontSize: 16,
+              textMonthFontSize: 16,
+              textDayHeaderFontSize: 13,
+            }}
+            style={{
+              paddingBottom: 15,
+            }}
+            onDayPress={(day) => {
+              console.log("selected day", day);
+              setSelected(day.dateString);
+              console.log(selected);
+              retrieveDayEvents();
+            }}
+            markedDates={{
+              [selected]: {
+                selected: true,
+                selectedDotColor: "#9660DA",
+                backgroundColor: "#9660DA",
+              },
+              [eventDates]: {
+                marked: true,
+              },
+            }}
+          ></Calendar>
         </View>
+        <View
+          style={{
+            width: "120%",
+            borderBottomWidth: 0.5,
+            borderColor: "#4B3196",
+          }}
+        ></View>
         <View style={styles.eventTitle}>
-          <Text style={{ color: "white" }}>Événements</Text>
+          <Text style={{ color: "white", fontSize: 18 }}>Événements</Text>
         </View>
         <ScrollView style={{ width: "100%" }}>
           <View>
@@ -64,7 +132,7 @@ const CalendarScreen = () => {
                 <View>
                   <Image
                     style={styles.img}
-                    source={require("../assets/bowling.jpg")}
+                    source={require("../assets/activities/Camping-min.jpg")}
                   ></Image>
                 </View>
                 <View style={styles.card}>
@@ -83,7 +151,7 @@ const CalendarScreen = () => {
                 <View>
                   <Image
                     style={styles.img}
-                    source={require("../assets/bowling.jpg")}
+                    source={require("../assets/activities/Bowling-min.jpg")}
                   ></Image>
                 </View>
                 <View style={styles.card}>
@@ -115,7 +183,7 @@ const CalendarScreen = () => {
               <View>
                 <Image
                   style={styles.img}
-                  source={require("../assets/bowling.jpg")}
+                  source={require("../assets/activities/Bowling-min.jpg")}
                 ></Image>
               </View>
               <View style={styles.card}>
@@ -139,12 +207,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: Platform.OS === "android" ? 35 : 0,
-    backgroundColor: "#9660DA",
+    backgroundColor: "#4B3196",
   },
 
   title: {
     width: "100%",
-    backgroundColor: "#9660DA",
+    backgroundColor: "#4B3196",
     alignItems: "center",
     paddingBottom: 10,
   },
@@ -152,19 +220,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     alignItems: "center",
-    paddingTop: 28,
+    paddingTop: 0,
     paddingBottom: 28,
     paddingRight: 28,
     paddingLeft: 28,
   },
   eventTitle: {
-    backgroundColor: "#4B3196",
+    backgroundColor: "#9660DA",
     borderRadius: 50,
     paddingTop: 4,
     paddingBottom: 4,
     paddingRight: 14,
     paddingLeft: 14,
-    marginTop: 15,
+    marginTop: 25,
     marginBottom: 15,
     alignSelf: "center",
   },

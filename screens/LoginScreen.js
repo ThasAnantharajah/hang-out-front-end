@@ -17,7 +17,8 @@ import { useState, useEffect } from "react";
 import { BACK_END_URL } from "../config";
 import ProfileCreationScreen from "./ProfileCreationScreen";
 
-const regExpMail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const regExpMail =
+  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const regExpUser = /^[a-zA-Z][a-zA-Z0-9._]{4,14}$/;
 
 const LoginScreen = ({ navigation }) => {
@@ -29,24 +30,21 @@ const LoginScreen = ({ navigation }) => {
   const [formValidation, setFormValidation] = useState(false);
   const [loginValidation, setLoginValidation] = useState(false);
 
- 
-
-
   const validatePassword = (pwd) => {
     let errorType = "";
 
     if (pwd === "") {
-      errorType = "Le mot de passe est vide";
+      errorType = "Password is empty.";
     } else if (!/[A-Z]/.test(pwd)) {
-      errorType = "Le mot de passe doit contenir au moins 1 lettre majuscule";
+      errorType = "Password must at least contain 1 capital letter.";
     } else if (!/[a-z]/.test(pwd)) {
-      errorType = "Le mot de passe doit contenir au moins 1 lettre minuscule";
+      errorType = "Password must at least contain 1 lowercase letter.";
     } else if (!/[0-9]{2}/.test(pwd)) {
-      errorType = "Le mot de passe doit contenir au moins 2 chiffres";
+      errorType = "Password must at least contaiin 2 numbers.";
     } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) {
-      errorType = "Le mot de passe doit contenir au moins un caractère spécial";
+      errorType = "Password must at least contain one special character.";
     } else if (pwd.length < 8) {
-      errorType = "Le mot de passe doit contenir au moins 8 caractères";
+      errorType = "Password must contain at least 8 characters.";
     }
 
     setErrors((prev) => ({ ...prev, password: errorType }));
@@ -56,7 +54,7 @@ const LoginScreen = ({ navigation }) => {
 
   const validateEmail = (email) => {
     if (!regExpMail.test(email)) {
-      setErrors((prev) => ({ ...prev, email: "email invalide" }));
+      setErrors((prev) => ({ ...prev, email: "Invalid email address." }));
     } else {
       setErrors((prev) => ({ ...prev, email: "" }));
     }
@@ -66,7 +64,7 @@ const LoginScreen = ({ navigation }) => {
 
   const validateUser = (user) => {
     if (!regExpUser.test(user)) {
-      setErrors((prev) => ({ ...prev, username: "username invalide" }));
+      setErrors((prev) => ({ ...prev, username: "Username too short." }));
     } else {
       setErrors((prev) => ({ ...prev, username: "" }));
     }
@@ -89,23 +87,20 @@ const LoginScreen = ({ navigation }) => {
     setFormValidation(isValid);
   };
 
-
-   const handleSubmit = (e) => {
-   
-    if (!formValidation) { 
+  const handleSubmit = (e) => {
+    if (!formValidation) {
       const data = { username, email, password };
-    fetch(BACK_END_URL + `/users/signup`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {});}
-   
+      fetch(BACK_END_URL + `/users/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {});
+    }
   };
 
-
-    const validationLogin = () => {
+  const validationLogin = () => {
     const isValid =
       !errors.username &&
       username.length >= 4 &&
@@ -119,26 +114,22 @@ const LoginScreen = ({ navigation }) => {
   };
 
   const handleLogIn = () => {
-    
-     if (!loginValidation) { 
-const data = { username, password, email };
-    fetch(BACK_END_URL + `/users/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.token) {
-          navigation.navigate("TabNavigator");
-        }
-      });
-console.log('first')
-     }
-    
+    if (!loginValidation) {
+      const data = { username, password, email };
+      fetch(BACK_END_URL + `/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.token) {
+            navigation.navigate("TabNavigator");
+          }
+        });
+      console.log("first");
+    }
   };
-
-
 
   return (
     <>
@@ -152,7 +143,17 @@ console.log('first')
             }}
           >
             <Text style={styles.logTitle}>Welcome to HangOut</Text>
-
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "600",
+                marginTop: 30,
+                marginBottom: 20,
+                color: "grey",
+              }}
+            >
+              Create an account
+            </Text>
             <View style={styles.inputContainer}>
               {/************************************Mail*************************************/}
               <View style={styles.inputSection}>
@@ -221,19 +222,11 @@ console.log('first')
                 disabled={formValidation}
               >
                 <Text
-                  style={{ color: "white", fontWeight: "bold", fontSize: 25 }}
+                  style={{ color: "white", fontWeight: "bold", fontSize: 20 }}
                 >
                   Sign Up
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setLog(2)}>
-                <Text
-                  style={{ marginTop: 30, color: "#9660DA", fontWeight: "600" }}
-                >
-                  Already have a account? Log in
-                </Text>
-              </TouchableOpacity>
-
               <TouchableOpacity onPress={() => setLog(2)}>
                 <Text
                   style={{ marginTop: 30, color: "#9660DA", fontWeight: "600" }}
@@ -469,7 +462,7 @@ const styles = StyleSheet.create({
 
   errorText: {
     color: "red",
-    marginBottom: 10,
+    marginTop: 10,
   },
 });
 

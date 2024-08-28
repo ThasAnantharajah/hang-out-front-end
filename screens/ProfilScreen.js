@@ -9,15 +9,30 @@ import {
   Image,
   Platform,
 } from "react-native";
+import { useEffect, useState } from "react";
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const ProfilScreen = () => {
+  const [userInfo, setUserInfo] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      fetch("http://localhost:3000/users/search")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("USER INFO", data);
+          setUserInfo(data.userList);
+          console.log(userInfo);
+        });
+    })();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.title}>
-        <Text style={{ fontSize: 25, fontWeight: "bold", color: "white" }}>
-          Mon profil
+        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+          My profile
         </Text>
       </View>
 
@@ -41,7 +56,7 @@ const ProfilScreen = () => {
               <Text
                 style={{ fontWeight: "bold", fontSize: 18, marginRight: 5 }}
               >
-                Guillaume
+                {userInfo.username}
               </Text>
               <View style={{ backgroundColor: "#4B3196", borderRadius: "50%" }}>
                 <FontAwesome style={styles.check} name="check" />
@@ -207,12 +222,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: Platform.OS === "android" ? 35 : 0,
-    backgroundColor: "#9660DA",
+    backgroundColor: "#4B3196",
   },
 
   title: {
     width: "100%",
-    backgroundColor: "#9660DA",
+    backgroundColor: "#4B3196",
     alignItems: "center",
     paddingBottom: 10,
   },
