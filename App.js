@@ -10,6 +10,9 @@ import FriendsScreen from "./screens/FriendsScreen";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileCreationScreen from "./screens/ProfileCreationScreen";
 
+import MessagesScreen from "./screens/MessagesScreen";
+import MessagesListScreen from "./screens/MessageListScreen";
+
 //Google Auth
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -25,8 +28,10 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
 import signup from "./reducers/signup";
 
-const reducers = combineReducers({ signup });
+const reducers = combineReducers({ signup, userIds });
 const persistConfig = { key: "hangoutStorage", storage: AsyncStorage };
+import userIds from "./reducers/users";
+import { beginAsyncEvent } from "react-native/Libraries/Performance/Systrace";
 
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
@@ -61,6 +66,18 @@ const TabNavigator = () => {
               iconName = "calendar-plus-o";
               break;
             case "Profile":
+              iconName = "user";
+              break;
+            case "Messages":
+              iconName = "comments";
+              break;
+            case "ProfileCreation":
+              iconName = "user";
+              break;
+            case "Messages":
+              iconName = "comments";
+              break;
+            case "ProfilCreation":
               iconName = "user";
               break;
           }
@@ -138,8 +155,10 @@ const TabNavigator = () => {
         component={FriendsScreen}
         options={{ tabBarBadge: 3 }}
       />
-
+      {/* <Tab.Screen name="ProfileCreation" component={ProfileCreationScreen} /> */}
       <Tab.Screen name="Profile" component={ProfilScreen} />
+      {/* <Tab.Screen name="Messages" component={MessagesScreen} /> */}
+      {/* <Tab.Screen name="Messages" component={MessagesListScreen} /> */}
     </Tab.Navigator>
   );
 };
@@ -151,8 +170,8 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={LoginScreen} />
-            <Stack.Screen name="TabNavigator" component={TabNavigator} />
             <Stack.Screen name="LoginScreen" component={LoginScreen} />
+            <Stack.Screen name="TabNavigator" component={TabNavigator} />
             <Stack.Screen
               name="ProfileCreationScreen"
               component={ProfileCreationScreen}

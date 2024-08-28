@@ -16,6 +16,7 @@ import { signupState } from "../reducers/signup";
 import { useState, useEffect } from "react";
 import { BACK_END_URL } from "../config";
 import ProfileCreationScreen from "./ProfileCreationScreen";
+import { updateUserId } from "../reducers/users";
 
 const regExpMail =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -29,6 +30,10 @@ const LoginScreen = ({ navigation }) => {
   const [errors, setErrors] = useState({});
   const [formValidation, setFormValidation] = useState(false);
   const [loginValidation, setLoginValidation] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const [user, setUser] = useState("");
 
   const validatePassword = (pwd) => {
     let errorType = "";
@@ -87,7 +92,8 @@ const LoginScreen = ({ navigation }) => {
     setFormValidation(isValid);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = () => {
+    console.log("ok");
     if (!formValidation) {
       const data = { username, email, password };
       fetch(BACK_END_URL + `/users/signup`, {
@@ -98,20 +104,21 @@ const LoginScreen = ({ navigation }) => {
         .then((response) => response.json())
         .then((data) => {});
     }
+    navigation.navigate("TabNavigator");
   };
 
-  const validationLogin = () => {
-    const isValid =
-      !errors.username &&
-      username.length >= 4 &&
-      !errors.password &&
-      /[A-Z]/.test(password) &&
-      /[a-z]/.test(password) &&
-      /[0-9]{2}/.test(password) &&
-      /[!@#$%^&*(),.?":{}|<>]/.test(password) &&
-      password.length >= 8;
-    setLoginValidation(isValid);
-  };
+  //   const validationLogin = () => {
+  //   const isValid =
+  //     !errors.username &&
+  //     username.length >= 4 &&
+  //     !errors.password &&
+  //     /[A-Z]/.test(password) &&
+  //     /[a-z]/.test(password) &&
+  //     /[0-9]{2}/.test(password) &&
+  //     /[!@#$%^&*(),.?":{}|<>]/.test(password) &&
+  //     password.length >= 8;
+  //   setLoginValidation(isValid);
+  // };
 
   const handleLogIn = () => {
     if (!loginValidation) {
@@ -124,10 +131,10 @@ const LoginScreen = ({ navigation }) => {
         .then((response) => response.json())
         .then((data) => {
           if (data.token) {
-            navigation.navigate("TabNavigator");
+            dispatch(updateUserId(data.userId)) &&
+              navigation.navigate("TabNavigator");
           }
         });
-      console.log("first");
     }
   };
 
@@ -219,12 +226,12 @@ const LoginScreen = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.signup}
                 onPress={() => handleSubmit()}
-                disabled={formValidation}
+                // disabled={formValidation}
               >
                 <Text
                   style={{ color: "white", fontWeight: "bold", fontSize: 20 }}
                 >
-                  Sign Up
+                  Sign Up2
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setLog(2)}>
@@ -321,7 +328,7 @@ const LoginScreen = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.signup}
                 onPress={() => handleLogIn()}
-                disabled={loginValidation}
+                // disabled={loginValidation}
               >
                 <Text
                   style={{ color: "white", fontWeight: "bold", fontSize: 20 }}

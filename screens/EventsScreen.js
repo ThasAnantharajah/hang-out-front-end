@@ -39,7 +39,7 @@ const EventsScreen = ({ navigation }) => {
     // if (startInput) queryParams.append("startInput", startInput);
     // if (endInput) queryParams.append("endInput", endInput);
 
-    fetch(`http://localhost:3000/events/search`)
+    fetch(`https://hang-out-back-end.vercel.app/events/search`)
       .then((response) => response.json())
       .then((data) => {
         console.log("SEARCH RESULTS:", data);
@@ -367,6 +367,31 @@ const styles = StyleSheet.create({
   },
   btn: {
     backgroundColor: "#D990A1",
+    paddingTop: 4,
+    paddingBottom: 4,
+    paddingRight: 14,
+    paddingLeft: 14,
+    borderRadius: 25,
+  },
+  imgtest: {
+    borderRadius: 50,
+    height: 90,
+    width: 90,
+    borderWidth: 1,
+    borderColor: "#9660DA",
+  },
+  cardtest: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 2,
+    paddingBottom: 2,
+
+    paddingLeft: 14,
+  },
+  btntest: {
+    backgroundColor: "#9660DA",
     paddingTop: 4,
     paddingBottom: 4,
     paddingRight: 14,

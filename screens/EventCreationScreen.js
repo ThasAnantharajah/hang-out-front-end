@@ -21,9 +21,8 @@ import {
 
 // import EventsScreen from "./EventsScreen";
 
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+// import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Picker } from "@react-native-picker/picker";
 
 const EventCreationScreen = ({ navigation }) => {
   const [eventName, setEventName] = useState("");
@@ -102,7 +101,7 @@ const EventCreationScreen = ({ navigation }) => {
     // (async () => {
     console.log("working fine");
 
-    fetch("http://localhost:3000/activities")
+    fetch("https://hang-out-back-end.vercel.app/activities")
       .then((res) => res.json())
       .then((data) => {
         console.log("activities test", data);
@@ -111,7 +110,7 @@ const EventCreationScreen = ({ navigation }) => {
         setActivitiesList(activityArray);
       });
 
-    fetch("http://localhost:3000/sports")
+    fetch("https://hang-out-back-end.vercel.app/sports")
       .then((res) => res.json())
       .then((data) => {
         let sportArray = data.sports.map((sport) => sport.name);
@@ -144,7 +143,7 @@ const EventCreationScreen = ({ navigation }) => {
     };
     console.log("Event to add:", newEvent);
 
-    fetch("http://localhost:3000/events/add", {
+    fetch("https://hang-out-back-end.vercel.app/events/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newEvent),
@@ -209,9 +208,11 @@ const EventCreationScreen = ({ navigation }) => {
                   mode="date"
                   is24Hour={true}
                   onChange={onChangeDate}
-                  style={{
-                    borderWidth: 1,
-                  }}
+                  style={
+                    {
+                      // borderWidth: 1,
+                    }
+                  }
                   accentColor="#9660DA"
                   minimumDate={new Date()}
                   maximumDate={new Date(2030, 12, 20)}
@@ -222,9 +223,11 @@ const EventCreationScreen = ({ navigation }) => {
                   mode="time"
                   is24Hour={true}
                   onChange={onChangeStartTime}
-                  style={{
-                    borderWidth: 1,
-                  }}
+                  style={
+                    {
+                      // borderWidth: 1,
+                    }
+                  }
                 />
 
                 <DateTimePicker
@@ -233,9 +236,11 @@ const EventCreationScreen = ({ navigation }) => {
                   mode="time"
                   is24Hour={true}
                   onChange={onChangeEndTime}
-                  style={{
-                    borderWidth: 1,
-                  }}
+                  style={
+                    {
+                      // borderWidth: 1,
+                    }
+                  }
                 />
               </View>
               <View style={{ flexDirection: "row" }}>

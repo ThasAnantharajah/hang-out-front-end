@@ -11,9 +11,14 @@ import {
 } from "react-native";
 
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { updateUserId } from "../reducers/users";
 
 const FriendsScreen = () => {
   const [showModal, setShowModal] = useState(false);
+
+  const friend = useSelector((state) => state.userIds.userId);
+  console.log("friendscreen:", friend);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -209,6 +214,18 @@ const FriendsScreen = () => {
           style={{ fontStyle: "italic", textAlign: "center", color: "grey" }}
         >
           Qui dit nouvelles sorties ...{"\n"} dit de nouveaux amis !{"\n"}😊
+        </Text>
+
+        <Text
+          style={{ fontStyle: "italic", textAlign: "center", color: "grey" }}
+        >
+          {friend}
+        </Text>
+
+        <Text
+          style={{ fontStyle: "italic", textAlign: "center", color: "grey" }}
+        >
+          {friend}
         </Text>
       </View>
     </SafeAreaView>

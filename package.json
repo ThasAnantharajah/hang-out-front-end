@@ -28,6 +28,7 @@
     "expo-image-picker": "^15.0.7",
     "expo-linear-gradient": "^13.0.2",
     "expo-status-bar": "~1.12.1",
+    "expo-updates": "~0.25.23",
     "express-fileupload": "^1.5.1",
     "prebuild": "^13.0.1",
     "react": "18.2.0",
