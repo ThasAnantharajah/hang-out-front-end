@@ -8,16 +8,20 @@ import EventsScreen from "./screens/EventsScreen";
 import CalendarScreen from "./screens/CalendarScreen";
 import FriendsScreen from "./screens/FriendsScreen";
 import ProfileCreationScreen from "./screens/ProfileCreationScreen";
+import MessagesScreen from "./screens/MessagesScreen";
+import MessagesListScreen from "./screens/MessageListScreen";
+
 
 import LoginScreen from "./screens/LoginScreen";
 import EventCreationScreen from "./screens/EventCreationScreen";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import signup from "./reducers/signup";
+import userIds from "./reducers/users";
 import { beginAsyncEvent } from "react-native/Libraries/Performance/Systrace";
 
 const store = configureStore({
-  reducer: { signup },
+  reducer: { signup, userIds },
 });
 
 const Stack = createNativeStackNavigator();
@@ -44,6 +48,12 @@ const TabNavigator = () => {
               iconName = "calendar-plus-o";
               break;
             case "Profil":
+              iconName = "user";
+              break;
+            case "Messages":
+              iconName = "comments";
+              break;
+            case "ProfilCreation":
               iconName = "user";
               break;
           }
@@ -87,31 +97,38 @@ const TabNavigator = () => {
         component={FriendsScreen}
         // options={{ tabBarBadge: 3 }}
       />
+      <Tab.Screen name="ProfilCreation" component={ProfileCreationScreen} />
       <Tab.Screen name="Events" component={EventsScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
+      {/* <Tab.Screen name="Messages" component={MessagesScreen} /> */}
+      <Tab.Screen name="Messages" component={MessagesListScreen} />
+      
     </Tab.Navigator>
   );
 };
 
 export default function App() {
   return (
+    <Provider store={store}>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {/* <Stack.Screen name="Home" component={LoginScreen} /> */}
-        {/* <Stack.Screen name="TabNavigator" component={TabNavigator} /> */}
-        {/* <Stack.Screen name="LoginScreen" component={LoginScreen} /> */}
-        <Stack.Screen
+         <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        <Stack.Screen name="TabNavigator" component={TabNavigator} /> 
+        
+        {/* <Stack.Screen
           name="ProfileCreationScreen"
           component={ProfileCreationScreen}
-        />
-        <Stack.Screen name="EventsScreen" component={EventsScreen} />
-        {/* <Stack.Screen
+        /> */}
+        {/* <Stack.Screen name="EventsScreen" component={EventsScreen} /> */}
+       {/* <Stack.Screen
           name="EventCreationScreen"
           component={EventCreationScreen}
-        /> */}
+        />  */}
       </Stack.Navigator>
     </NavigationContainer>
+    </Provider>
   );
 }
 

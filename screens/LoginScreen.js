@@ -16,6 +16,7 @@ import { signupState } from "../reducers/signup";
 import { useState, useEffect } from "react";
 import { BACK_END_URL } from "../config";
 import ProfileCreationScreen from "./ProfileCreationScreen";
+import { updateUserId } from "../reducers/users";
 
 const regExpMail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const regExpUser = /^[a-zA-Z][a-zA-Z0-9._]{4,14}$/;
@@ -29,8 +30,9 @@ const LoginScreen = ({ navigation }) => {
   const [formValidation, setFormValidation] = useState(false);
   const [loginValidation, setLoginValidation] = useState(false);
 
- 
+  const dispatch = useDispatch();
 
+  const [user, setUser] = useState("");
 
   const validatePassword = (pwd) => {
     let errorType = "";
@@ -89,56 +91,51 @@ const LoginScreen = ({ navigation }) => {
     setFormValidation(isValid);
   };
 
-
-   const handleSubmit = (e) => {
-   
-    if (!formValidation) { 
+  const handleSubmit = () => {
+    console.log("ok");
+    if (!formValidation) {
       const data = { username, email, password };
-    fetch(BACK_END_URL + `/users/signup`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {});}
-   
+      fetch(BACK_END_URL + `/users/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {});
+    }
+    navigation.navigate("TabNavigator");
   };
 
-
-    const validationLogin = () => {
-    const isValid =
-      !errors.username &&
-      username.length >= 4 &&
-      !errors.password &&
-      /[A-Z]/.test(password) &&
-      /[a-z]/.test(password) &&
-      /[0-9]{2}/.test(password) &&
-      /[!@#$%^&*(),.?":{}|<>]/.test(password) &&
-      password.length >= 8;
-    setLoginValidation(isValid);
-  };
+  //   const validationLogin = () => {
+  //   const isValid =
+  //     !errors.username &&
+  //     username.length >= 4 &&
+  //     !errors.password &&
+  //     /[A-Z]/.test(password) &&
+  //     /[a-z]/.test(password) &&
+  //     /[0-9]{2}/.test(password) &&
+  //     /[!@#$%^&*(),.?":{}|<>]/.test(password) &&
+  //     password.length >= 8;
+  //   setLoginValidation(isValid);
+  // };
 
   const handleLogIn = () => {
-    
-     if (!loginValidation) { 
-const data = { username, password, email };
-    fetch(BACK_END_URL + `/users/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.token) {
-          navigation.navigate("TabNavigator");
-        }
-      });
-console.log('first')
-     }
-    
+    if (!loginValidation) {
+      const data = { username, password, email };
+      fetch(BACK_END_URL + `/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.token) {
+            dispatch(updateUserId(data.userId)) &&
+              navigation.navigate("TabNavigator");
+          }
+        });
+    }
   };
-
-
 
   return (
     <>
@@ -218,22 +215,14 @@ console.log('first')
               <TouchableOpacity
                 style={styles.signup}
                 onPress={() => handleSubmit()}
-                disabled={formValidation}
+                // disabled={formValidation}
               >
                 <Text
                   style={{ color: "white", fontWeight: "bold", fontSize: 25 }}
                 >
-                  Sign Up
+                  Sign Up2
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setLog(2)}>
-                <Text
-                  style={{ marginTop: 30, color: "#9660DA", fontWeight: "600" }}
-                >
-                  Already have a account? Log in
-                </Text>
-              </TouchableOpacity>
-
               <TouchableOpacity onPress={() => setLog(2)}>
                 <Text
                   style={{ marginTop: 30, color: "#9660DA", fontWeight: "600" }}
@@ -328,7 +317,7 @@ console.log('first')
               <TouchableOpacity
                 style={styles.signup}
                 onPress={() => handleLogIn()}
-                disabled={loginValidation}
+                // disabled={loginValidation}
               >
                 <Text
                   style={{ color: "white", fontWeight: "bold", fontSize: 20 }}
