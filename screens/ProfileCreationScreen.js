@@ -72,6 +72,17 @@ const ProfileCreationScreen = ({ navigation }) => {
 
   const dispatch = useDispatch();
 
+  const [profilePhoto, setProfilePhoto] = useState("");
+  const [profileName, setProfileName] = useState("");
+  const [profileDateOfBirth, setProfileDateOfBirth] = useState("");
+  const [profileGender, setProfileGender] = useState("");
+  const [profileCity, setProfileCity] = useState("");
+  const [profileHobbies, setProfileHobbies] = useState([]);
+  const [profileSports, setProfileSports] = useState([]);
+  const [profileDescription, setProfileDescription] = useState("");
+
+
+ 
   let cameraRef = useRef(null);
 
   const handleImgPicker = async () => {
@@ -81,7 +92,63 @@ const ProfileCreationScreen = ({ navigation }) => {
       aspect: [4, 3],
       quality: 1,
     });
+
+
+    if (!result.canceled) {
+       const file = result.assets[0];
+      console.log(result)
+      setImage(result.assets[0].uri);
+      setProfilePhoto(result.assets[0].uri)
+          
+      const formData = new FormData();
+
+      formData.append("photoFromGallery", {
+        uri: file.uri,
+        name: "profilePicture.jpg",
+        type: file.type,
+      });
+      
+    }
+
+          fetch(BACK_END_URL + `/upload`, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            // dispatch(addPhoto(data.url));
+            console.log('fetch',data)
+           
+            
+          } 
+          
+        });
+        
   };
+
+  
+  // if (photo) {
+  
+
+  //     fetch(BACK_END_URL + `/upload`, {
+  //       method: "POST",
+  //       body: formData,
+  //     })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         if (data.result) {
+  //           // dispatch(addPhoto(data.url));
+  //           setImage(data.url)
+  //           setProfilePhoto(data.url)
+            
+  //         } 
+  //       });
+  //   }
+
+
+
+
 
   const takePicture = async () => {
     console.log("takepicture");
@@ -104,9 +171,10 @@ const ProfileCreationScreen = ({ navigation }) => {
         .then((data) => {
           if (data.result) {
             // dispatch(addPhoto(data.url));
-            setImage(data.url);
-            setProfilePic(data.url);
-          }
+            setImage(data.url)
+            setProfilePhoto(data.url)
+          
+          } 
         });
     }
   };
