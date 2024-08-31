@@ -26,11 +26,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // import storage from "redux-persist/lib/storage";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
+// reducers imports
 import signup from "./reducers/signup";
-
-const reducers = combineReducers({ signup, userIds });
-const persistConfig = { key: "hangoutStorage", storage: AsyncStorage };
+import user from "./reducers/user";
 import userIds from "./reducers/users";
+
+const reducers = combineReducers({ signup, userIds, user });
+const persistConfig = { key: "hangoutStorage", storage: AsyncStorage };
 import { beginAsyncEvent } from "react-native/Libraries/Performance/Systrace";
 
 const store = configureStore({
@@ -122,12 +124,12 @@ const TabNavigator = () => {
         },
         tabBarStyle: {
           position: "absolute",
-          height: 80,
+          height: 90,
           backgroundColor: "white",
           // borderTopWidth: 0.5,
           // borderTopColor: "#B090D9",
-          paddingBottom: 15,
-          paddingTop: 0,
+          paddingBottom: 20,
+          paddingTop: 5,
           borderTopLeftRadius: "25%",
           borderTopRightRadius: "25%",
 
@@ -140,7 +142,7 @@ const TabNavigator = () => {
 
         tabBarInactiveTintColor: "#767577",
         headerShown: false,
-        tabBarLabelStyle: { fontWeight: "700", fontSize: 10 },
+        tabBarLabelStyle: { fontWeight: "700", fontSize: 10, marginBottom: 6 },
         tabBarOptions: {
           activeBackgroundColor: "blue",
           inactiveBackgroundColor: "grey",

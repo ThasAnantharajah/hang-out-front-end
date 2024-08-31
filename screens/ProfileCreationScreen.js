@@ -11,13 +11,24 @@ import {
   TextInput,
   Modal,
   Button,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Camera, CameraType, FlashMode } from "expo-camera/legacy";
 import { useEffect, useState, useRef } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { BACK_END_URL } from "../config";
-
+import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
+
+import {
+  nameUpdate,
+  genderUpdate,
+  sportsUpdate,
+  activitiesUpdate,
+  ageUpdate,
+  cityUpdate,
+  descUpdate,
+} from "../reducers/user";
 
 import {
   SelectList,
@@ -36,6 +47,7 @@ const ProfileCreationScreen = ({ navigation }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [image, setImage] = useState(null);
+  const [profilePic, setProfilePic] = useState(null);
 
   //profile inputs
   const [name, setName] = useState("");
@@ -56,6 +68,8 @@ const ProfileCreationScreen = ({ navigation }) => {
     { key: "2", value: "Female" },
     { key: "3", value: "Don't want to say" },
   ];
+
+  const dispatch = useDispatch();
 
   let cameraRef = useRef(null);
 
@@ -90,7 +104,7 @@ const ProfileCreationScreen = ({ navigation }) => {
           if (data.result) {
             // dispatch(addPhoto(data.url));
             setImage(data.url);
-            setProfilePhoto(data.url);
+            setProfilePic(data.url);
           }
         });
     }
@@ -101,28 +115,40 @@ const ProfileCreationScreen = ({ navigation }) => {
     setShowModal(true);
   };
 
-  // const handleDate = (date) => {
-  //   // Supprimer tous les caractères sauf les chiffres
-  //   const onlyNumber = date.replace(/[^0-9]/g, "");
+  const handleDate = (input) => {
+    let slashedDate;
 
-  //   if (onlyNumber.length <= 2) {
-  //     setDate(onlyNumber);
-  //   } else if (onlyNumber.length <= 4) {
-  //     setDate(`${onlyNumber.slice(0, 2)}/${onlyNumber.slice(2, 4)}`);
-  //   } else {
-  //     setDate(
-  //       `${onlyNumber.slice(0, 2)}/${onlyNumber.slice(2, 4)}/${onlyNumber.slice(
-  //         4,
-  //         8
-  //       )}`
-  //     );
-  //   }
-  //   setBirthdate(date)
+    console.log(input.slice(0, 2));
+    console.log(input.slice(2, 4));
+    console.log(input.slice(-4));
 
-  // };
+    if (input.length === 8) {
+      slashedDate = `${input.slice(0, 2)}/${input.slice(2, 4)}/${input.slice(
+        -4
+      )}`;
+    }
+    setBirthdate(slashedDate);
+
+    console.log(birthdate);
+  };
 
   useEffect(() => {
     (async () => {
+      console.log("Username stored in redux:", usernameLogged);
+      console.log(
+        "User infos stored in redux:",
+        "USERNAME:",
+        userInfos.username,
+        "GENDER:",
+        userInfos.gender,
+        "SPORTS:",
+        userInfos.sports,
+        "ACTIVITIES:",
+        userInfos.activities,
+        "EMAIL:",
+        userInfos.email
+      );
+
       const result = await Camera.requestCameraPermissionsAsync();
       if (result) {
         setHasPermission(result.status === "granted");
@@ -131,7 +157,6 @@ const ProfileCreationScreen = ({ navigation }) => {
       fetch("https://hang-out-back-end.vercel.app/activities")
         .then((res) => res.json())
         .then((data) => {
-          console.log("activities test", data);
           let activityArray = data.activities.map((activity, i) => ({
             key: i,
             value: activity.name,
@@ -148,16 +173,14 @@ const ProfileCreationScreen = ({ navigation }) => {
             });
         });
     })();
-  }, []);
+  }, [usernameLogged]);
 
-  const onChangeBirthdate = (event, selectedDate) => {
-    console.log("BIRTHDATE RAW:", birthdate);
-
-    setBirthdate(new Date(selectedDate));
-  };
+  // UPDATE USER FUNCTION WITH PUT METHOD
+  const userInfos = useSelector((state) => state.user.user);
+  const usernameLogged = useSelector((state) => state.user.user.username);
 
   const onSubmit = () => {
-    const newUser = {
+    const updateUser = {
       name: name,
       dateofbirth: birthdate,
       gender: gender,
@@ -165,19 +188,32 @@ const ProfileCreationScreen = ({ navigation }) => {
       activities: favoriteActivities,
       sports: favoriteSports,
       city: city,
-      profilePictureUrl: "",
+      profilePic: profilePic,
     };
-    console.log("User to add:", newUser);
+    console.log("Update info user:", updateUser);
 
-    fetch("http://localhost:3000/users/", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newUser),
+    fetch(
+      `https://hang-out-back-end.vercel.app/users/update/${usernameLogged}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateUser),
+      }
+    ).then((response) => {
+      return response.json().then((data) => ({
+        status: response.status,
+        data,
+      }));
     });
-  };
+    dispatch(nameUpdate(name));
+    dispatch(genderUpdate(gender));
+    dispatch(ageUpdate(birthdate));
+    dispatch(cityUpdate(city));
+    dispatch(descUpdate(description));
 
-  // const handleSave = () =>{
-  // }
+    dispatch(sportsUpdate(sportsList));
+    dispatch(activitiesUpdate(activitiesList));
+  };
 
   return (
     <View style={styles.container}>
@@ -260,127 +296,103 @@ const ProfileCreationScreen = ({ navigation }) => {
         </Modal>
       )}
 
-      <SafeAreaView style={styles.container}>
-        <View style={styles.title}>
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "bold",
-              color: "white",
-            }}
-          >
-            Create my profile
-          </Text>
-        </View>
-        {/* ici test */}
-        <View style={styles.profilContainer}>
-          <View style={{ width: "100%", height: "35%" }}>
-            <Image style={styles.camera} source={{ uri: image }}></Image>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={80}
+      >
+        <SafeAreaView style={styles.container}>
+          <View style={styles.title}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                color: "white",
+              }}
+            >
+              Create my profile
+            </Text>
           </View>
-          {/**************************************************************************CAMERA************************************************************************/}
-          <View
-            style={{
-              flexDirection: "row",
-              marginTop: 20,
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "40%",
-            }}
-          >
-            <View>
-              <View
-                style={{
-                  justifyContent: "center",
-                  marginBottom: 15,
-                  alignItems: "center",
-                  backgroundColor: "#8F5CD1",
-                  borderRadius: 25,
-                  height: 50,
-                  width: 50,
-                }}
-              >
-                <TouchableOpacity title="Flip" onPress={() => handleCamera()}>
-                  <FontAwesome name="camera" size={25} color="white" />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={{ color: "#8F5CD1", fontWeight: "700" }}>
-                Camera
-              </Text>
+          {/* ici test */}
+          <View style={styles.profilContainer}>
+            <View style={{ width: "100%", height: "35%" }}>
+              <Image style={styles.camera} source={{ uri: image }}></Image>
             </View>
-
-            <View>
-              <View
-                style={{
-                  justifyContent: "center",
-                  marginBottom: 15,
-                  alignItems: "center",
-                  backgroundColor: "#8F5CD1",
-                  borderRadius: 25,
-                  height: 50,
-                  width: 50,
-                }}
-              >
-                <TouchableOpacity
-                  title="Flip"
-                  onPress={() => handleImgPicker()}
-                >
-                  <FontAwesome name="th-large" size={25} color="white" />
-                </TouchableOpacity>
-              </View>
-              <Text style={{ color: "#8F5CD1", fontWeight: "700" }}>
-                Gallery
-              </Text>
-            </View>
-          </View>
-
-          {/********************************************************************MY PROFILE************************************************************************/}
-          <ScrollView
-            style={{ width: "100%" }}
-            // automaticallyAdjustContentInsets={true}
-            // alwaysBounceVertical={true}
-            // bounces={true}
-            // contentInsetAdjustmentBehavior={"scrollableAxes"}
-          >
-            <View style={styles.inputContainer}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  marginBottom: 10,
-                  color: "#8F5CD1",
-                }}
-              >
-                My profile
-              </Text>
-              <Text
-                style={{
-                  fontWeight: "600",
-                  color: "#09051F",
-                  paddingLeft: 4,
-                  marginBottom: 5,
-                }}
-              >
-                Your name
-              </Text>
-              <TextInput
-                placeholder="Name"
-                returnKeyType="next"
-                // value={name}
-                style={styles.inputProfile}
-                onChangeText={(text) => setName(text)}
-              ></TextInput>
-
-              <View style={{ flexDirection: "row", gap: "90%", paddingTop: 5 }}>
-                <Text
+            {/**************************************************************************CAMERA************************************************************************/}
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "40%",
+              }}
+            >
+              <View>
+                <View
                   style={{
-                    fontWeight: "600",
-                    color: "#09051F",
-                    paddingLeft: 4,
-                    marginBottom: 5,
+                    justifyContent: "center",
+                    marginBottom: 15,
+                    alignItems: "center",
+                    backgroundColor: "#8F5CD1",
+                    borderRadius: 25,
+                    height: 50,
+                    width: 50,
                   }}
                 >
-                  Date of birth
+                  <TouchableOpacity title="Flip" onPress={() => handleCamera()}>
+                    <FontAwesome name="camera" size={25} color="white" />
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={{ color: "#8F5CD1", fontWeight: "700" }}>
+                  Camera
+                </Text>
+              </View>
+
+              <View>
+                <View
+                  style={{
+                    justifyContent: "center",
+                    marginBottom: 15,
+                    alignItems: "center",
+                    backgroundColor: "#8F5CD1",
+                    borderRadius: 25,
+                    height: 50,
+                    width: 50,
+                  }}
+                >
+                  <TouchableOpacity
+                    title="Flip"
+                    onPress={() => handleImgPicker()}
+                  >
+                    <FontAwesome name="th-large" size={25} color="white" />
+                  </TouchableOpacity>
+                </View>
+                <Text style={{ color: "#8F5CD1", fontWeight: "700" }}>
+                  Gallery
+                </Text>
+              </View>
+            </View>
+
+            {/********************************************************************MY PROFILE************************************************************************/}
+            <ScrollView
+              style={{ width: "100%" }}
+              // automaticallyAdjustContentInsets={true}
+              // alwaysBounceVertical={true}
+              // bounces={true}
+              // contentInsetAdjustmentBehavior={"scrollableAxes"}
+            >
+              <View style={styles.inputContainer}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    marginBottom: 10,
+                    color: "#8F5CD1",
+                  }}
+                >
+                  My profile
                 </Text>
                 <Text
                   style={{
@@ -390,96 +402,119 @@ const ProfileCreationScreen = ({ navigation }) => {
                     marginBottom: 5,
                   }}
                 >
-                  Gender
+                  Your name
                 </Text>
-              </View>
-
-              <View style={{ flexDirection: "row" }}>
-                {/* <DateTimePicker
-                placeholder="Birthdate"
-                testID="dateTimePicker"
-                value={date}
-                mode="date"
-                onChange={onChangeBirthdate}
-                style={{
-                  flex: 1,
-                  borderWidth: 2,
-                  height: 55,
-                  backgroundColor: "white",
-                  fontSize: 20,
-                }}
-                name="Birthdate"
-                accentColor="#8F5CD1"
-              /> */}
+                <Text
+                  style={{
+                    fontWeight: "600",
+                    color: "#09051F",
+                    paddingLeft: 4,
+                    marginBottom: 5,
+                  }}
+                ></Text>
                 <TextInput
-                  type={"datetime"}
-                  options={{
-                    format: "DD/MM/YYYY",
-                  }}
-                  value={birthdate}
-                  onChangeText={(text) => setBirthdate(text)}
-                  placeholder="MM/DD/YYYY"
-                  keyboardType="numeric"
-                  maxLength={10}
+                  placeholder="Name"
+                  returnKeyType="next"
+                  // value={name}
+                  style={styles.inputProfile}
+                  onChangeText={(text) => setName(text)}
+                ></TextInput>
+
+                <View
+                  style={{ flexDirection: "row", gap: "90%", paddingTop: 5 }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "600",
+                      color: "#09051F",
+                      paddingLeft: 4,
+                      marginBottom: 5,
+                    }}
+                  >
+                    Date of birth
+                  </Text>
+                  <Text
+                    style={{
+                      fontWeight: "600",
+                      color: "#09051F",
+                      paddingLeft: 4,
+                      marginBottom: 5,
+                    }}
+                  >
+                    Gender
+                  </Text>
+                </View>
+
+                <View style={{ flexDirection: "row" }}>
+                  <TextInput
+                    type={"datetime"}
+                    options={{
+                      format: "DD/MM/YYYY",
+                    }}
+                    value={birthdate}
+                    onChangeText={(text) => handleDate(text)}
+                    placeholder="DD/MM/YYYY"
+                    keyboardType="numeric"
+                    maxLength={10}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: "#C8C8C8",
+                      borderRadius: 8,
+                      padding: 5,
+                      margin: 5,
+                      height: 45,
+                      width: "50%",
+                    }}
+                  />
+
+                  <SelectList
+                    setSelected={(value) => setGender(value)}
+                    data={data}
+                    save="value"
+                    placeholder="Gender"
+                    placeholderTextColor="#C8C8C8"
+                    searchPlaceholder="Gender"
+                    search={false}
+                    dropdownStyles={{
+                      height: 120,
+                      marginTop: 50,
+                      borderWidth: "none",
+                      backgroundColor: "#fff",
+                      // position: "absolute",
+                      width: 300,
+                    }}
+                    boxStyles={{
+                      borderWidth: 1,
+                      borderColor: "#C8C8C8",
+                      borderRadius: 8,
+                      padding: 5,
+                      margin: 5,
+                      height: 45,
+                      width: "65%",
+                    }}
+                    inputStyles={{ color: "grey" }}
+                  />
+                </View>
+                <Text
                   style={{
-                    borderWidth: 1,
-                    borderColor: "#C8C8C8",
-                    borderRadius: 8,
-                    padding: 5,
-                    margin: 5,
-                    height: 45,
-                    width: "50%",
+                    fontWeight: "600",
+                    color: "#09051F",
+                    paddingLeft: 4,
+                    marginBottom: 5,
+                    paddingTop: 5,
                   }}
-                />
-
-                <SelectList
-                  setSelected={(value) => setGender(value)}
-                  data={data}
-                  save="value"
-                  placeholder="Gender"
-                  placeholderTextColor="#C8C8C8"
-                  searchPlaceholder="Gender"
-                  search={false}
-                  dropdownStyles={{
-                    height: 120,
-                    marginTop: 50,
-                    borderWidth: "none",
-                    backgroundColor: "#fff",
-                    position: "absolute",
-                    width: 300,
-                  }}
-                  boxStyles={{
-                    borderWidth: 1,
-                    borderColor: "#C8C8C8",
-                    borderRadius: 8,
-                    padding: 5,
-                    margin: 5,
-                    height: 45,
-                    width: "65%",
-                  }}
-                  inputStyles={{ color: "grey" }}
-                />
+                >
+                  Where are you from?
+                </Text>
+                <TextInput
+                  placeholder="City"
+                  value={city}
+                  style={styles.inputProfile}
+                  onChangeText={(text) => setCity(text)}
+                ></TextInput>
               </View>
-              <Text
-                style={{
-                  fontWeight: "600",
-                  color: "#09051F",
-                  paddingLeft: 4,
-                  marginBottom: 5,
-                  paddingTop: 5,
-                }}
-              >
-                Where are you from?
-              </Text>
-              <TextInput
-                placeholder="City"
-                value={city}
-                style={styles.inputProfile}
-                onChangeText={(text) => setCity(text)}
-              ></TextInput>
-            </View>
 
-            {/* <View
+              {/* <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
@@ -487,159 +522,165 @@ const ProfileCreationScreen = ({ navigation }) => {
             }}
           ></View> */}
 
-            <View style={styles.interest}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  marginBottom: 10,
-                  color: "#8F5CD1",
-                }}
-              >
-                Description
-              </Text>
-              <Text
-                style={{
-                  fontWeight: "600",
-                  color: "#09051F",
-                  paddingLeft: 4,
-                  marginBottom: 5,
-                }}
-              >
-                Tell us more about yourself
-              </Text>
-              <TextInput
-                placeholder="Describe yourself..."
-                returnKeyType="next"
-                multiline={true}
-                style={styles.inputProfile}
-                onChangeText={(text) => setDescription(text)}
-              ></TextInput>
-            </View>
-            <View style={styles.interest}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  marginTop: 10,
-                  marginBottom: 10,
-                  color: "#8F5CD1",
-                }}
-              >
-                Sports & Hobbies
-              </Text>
-
-              <Text
-                style={{
-                  fontWeight: "600",
-                  color: "#09051F",
-                  paddingLeft: 4,
-                  marginBottom: 5,
-                }}
-              >
-                Pick your favorite activities and sports !{" "}
-              </Text>
-              <MultipleSelectList
-                setSelected={(activ) => setFavoriteActivities(activ)}
-                data={activitiesList}
-                placeholder="Select your favorite activities"
-                searchPlaceholder="Search an activity"
-                save="value"
-                color="grey"
-                boxStyles={{
-                  flex: 1,
-                  borderWidth: 1,
-                  borderColor: "#C8C8C8",
-                  borderRadius: 8,
-                  padding: 5,
-                  margin: 5,
-                  // height: 45,
-                  color: "#C8C8C8",
-                }}
-                label="Activities"
-                dropdownStyles={{
-                  height: 120,
-                  borderWidth: "none",
-                  backgroundColor: "#fff",
-                  width: 300,
-                }}
-                dropdownShown={false}
-                badgeStyles={{ backgroundColor: "#B090D9", fontSize: 15 }}
-                badgeTextStyles={{ fontSize: 15 }}
-                checkBoxStyles={{
-                  borderColor: "#8F5CD1",
-                  borderWidth: 1.5,
-                }}
-                inputStyles={{ color: "grey" }}
-              />
-
-              <MultipleSelectList
-                setSelected={(spt) => setFavoriteSports(spt)}
-                placeholder="Select your favorite sports"
-                searchPlaceholder="Search a sport"
-                data={sportsList}
-                save="value"
-                labelStyles={{ fontWeight: "700", color: "#9660DA" }}
-                boxStyles={{
-                  borderWidth: 1,
-                  borderColor: "#C8C8C8",
-                  borderRadius: 8,
-                  padding: 5,
-                  margin: 5,
-                  // height: 45,
-                }}
-                label="Sports"
-                dropdownStyles={{
-                  height: 120,
-                  borderWidth: "none",
-                  backgroundColor: "#fff",
-                  width: 300,
-                }}
-                badgeStyles={{ backgroundColor: "#B090D9", fontSize: 15 }}
-                badgeTextStyles={{ fontSize: 15 }}
-                inputStyles={{ color: "grey" }}
-              />
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: "20%",
-                  justifyContent: "space-between",
-                  marginTop: 15,
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.previousButton}
-                  onPress={() => {
-                    navigation.navigate("LoginScreen");
+              <View style={styles.interest}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    marginBottom: 10,
+                    color: "#8F5CD1",
                   }}
                 >
-                  <Text style={styles.buttonText}>Previous</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.nextButton}
-                  onPress={() => {
-                    navigation.navigate("TabNavigator");
-                    console.log(
-                      "User data:",
-                      name,
-                      city,
-                      description,
-                      birthdate,
-                      favoriteActivities,
-                      favoriteSports,
-                      gender
-                    );
+                  Description
+                </Text>
+                <Text
+                  style={{
+                    fontWeight: "600",
+                    color: "#09051F",
+                    paddingLeft: 4,
+                    marginBottom: 5,
                   }}
                 >
-                  <Text style={styles.buttonText}>Next</Text>
-                </TouchableOpacity>
+                  Tell us more about yourself
+                </Text>
+                <TextInput
+                  placeholder="Describe yourself..."
+                  returnKeyType="next"
+                  multiline={true}
+                  style={styles.inputProfile}
+                  onChangeText={(text) => setDescription(text)}
+                ></TextInput>
               </View>
-            </View>
-          </ScrollView>
-        </View>
-      </SafeAreaView>
+              <View style={styles.interest}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    marginTop: 10,
+                    marginBottom: 10,
+                    color: "#8F5CD1",
+                  }}
+                >
+                  Sports & Hobbies
+                </Text>
+
+                <Text
+                  style={{
+                    fontWeight: "600",
+                    color: "#09051F",
+                    paddingLeft: 4,
+                    marginBottom: 5,
+                  }}
+                >
+                  Pick your favorite activities and sports !
+                </Text>
+                <MultipleSelectList
+                  setSelected={(activ) => setFavoriteActivities(activ)}
+                  data={activitiesList}
+                  placeholder="Select your favorite activities"
+                  searchPlaceholder="Search an activity"
+                  save="value"
+                  color="grey"
+                  boxStyles={{
+                    flex: 1,
+                    borderWidth: 1,
+                    borderColor: "#C8C8C8",
+                    borderRadius: 8,
+                    padding: 5,
+                    margin: 5,
+                    // height: 45,
+                    color: "#C8C8C8",
+                  }}
+                  label="Activities"
+                  dropdownStyles={{
+                    height: 120,
+                    borderWidth: "none",
+                    backgroundColor: "#fff",
+                    width: 300,
+                  }}
+                  dropdownShown={false}
+                  badgeStyles={{ backgroundColor: "#B090D9", fontSize: 15 }}
+                  badgeTextStyles={{ fontSize: 15 }}
+                  checkBoxStyles={{
+                    borderColor: "#8F5CD1",
+                    borderWidth: 1.5,
+                  }}
+                  inputStyles={{ color: "grey" }}
+                />
+
+                <MultipleSelectList
+                  setSelected={(spt) => setFavoriteSports(spt)}
+                  placeholder="Select your favorite sports"
+                  searchPlaceholder="Search a sport"
+                  data={sportsList}
+                  save="value"
+                  boxStyles={{
+                    borderWidth: 1,
+                    borderColor: "#C8C8C8",
+                    borderRadius: 8,
+                    padding: 5,
+                    margin: 5,
+                    // height: 45,
+                  }}
+                  label="Sports"
+                  dropdownStyles={{
+                    height: 120,
+                    borderWidth: "none",
+                    backgroundColor: "#fff",
+                    width: 300,
+                  }}
+                  badgeStyles={{ backgroundColor: "#B090D9", fontSize: 15 }}
+                  badgeTextStyles={{ fontSize: 15 }}
+                  checkBoxStyles={{
+                    borderColor: "#8F5CD1",
+                    borderWidth: 1.5,
+                  }}
+                  inputStyles={{ color: "grey" }}
+                />
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: "20%",
+                    justifyContent: "space-between",
+                    marginTop: 15,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={styles.previousButton}
+                    onPress={() => {
+                      navigation.navigate("LoginScreen");
+                      console.log(usernameLogged);
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Previous</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.nextButton}
+                    onPress={() => {
+                      navigation.navigate("TabNavigator");
+                      onSubmit();
+                      console.log(
+                        "User data:",
+                        name,
+                        city,
+                        description,
+                        birthdate,
+                        favoriteActivities,
+                        favoriteSports,
+                        gender
+                      );
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Next</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </View>
   );
 };

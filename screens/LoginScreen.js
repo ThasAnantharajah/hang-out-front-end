@@ -17,6 +17,7 @@ import { useState, useEffect } from "react";
 import { BACK_END_URL } from "../config";
 import ProfileCreationScreen from "./ProfileCreationScreen";
 import { updateUserId } from "../reducers/users";
+import { emailUpdate, usernameUpdate } from "../reducers/user";
 
 const regExpMail =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -34,7 +35,6 @@ const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const [user, setUser] = useState("");
-
   const validatePassword = (pwd) => {
     let errorType = "";
 
@@ -96,15 +96,20 @@ const LoginScreen = ({ navigation }) => {
     console.log("ok");
     if (!formValidation) {
       const data = { username, email, password };
-      fetch(BACK_END_URL + `/users/signup`, {
+      fetch("https://hang-out-back-end.vercel.app/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
         .then((response) => response.json())
-        .then((data) => {});
+        .then((data) => {
+          console.log("Adding user done.");
+        });
     }
-    navigation.navigate("TabNavigator");
+    dispatch(usernameUpdate(username));
+    dispatch(emailUpdate(email));
+    console.log("Passed dispatch x2");
+    navigation.navigate("ProfileCreationScreen");
   };
 
   //   const validationLogin = () => {
@@ -123,7 +128,7 @@ const LoginScreen = ({ navigation }) => {
   const handleLogIn = () => {
     if (!loginValidation) {
       const data = { username, password, email };
-      fetch(BACK_END_URL + `/users/login`, {
+      fetch("https://hang-out-back-end.vercel.app/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -131,6 +136,7 @@ const LoginScreen = ({ navigation }) => {
         .then((response) => response.json())
         .then((data) => {
           if (data.token) {
+            console.log("User logged in.");
             dispatch(updateUserId(data.userId)) &&
               navigation.navigate("TabNavigator");
           }
@@ -231,7 +237,7 @@ const LoginScreen = ({ navigation }) => {
                 <Text
                   style={{ color: "white", fontWeight: "bold", fontSize: 20 }}
                 >
-                  Sign Up2
+                  Sign Up
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setLog(2)}>

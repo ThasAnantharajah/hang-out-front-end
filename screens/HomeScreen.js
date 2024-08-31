@@ -7,11 +7,35 @@ import {
   SafeAreaView,
   Image,
 } from "react-native";
-import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import GradientText from "react-native-gradient-texts";
 
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 const HomeScreen = () => {
+  const dispatch = useDispatch();
+  const userInfos = useSelector((state) => state.user.user);
+
+  useEffect(() => {
+    (async () => {
+      console.log("Username stored in redux:", usernameLogged);
+      console.log(
+        "User infos stored in redux:",
+        "USERNAME:",
+        userInfos.username,
+        "GENDER:",
+        userInfos.gender,
+        "SPORTS:",
+        userInfos.sports,
+        "ACTIVITIES:",
+        userInfos.activities,
+        "EMAIL:",
+        userInfos.email
+      );
+    })();
+  }, []);
+
   return (
     <SafeAreaView style={{ alignItems: "center" }}>
       <View style={styles.container}>

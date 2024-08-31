@@ -4,8 +4,13 @@ const initialState = {
   user: {
     username: "",
     email: "",
+    name: "",
     gender: "",
-    description: "",
+    sports: [],
+    activities: [],
+    age: "",
+    city: "",
+    desc: "",
   },
 };
 
@@ -13,14 +18,47 @@ export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    emmailUpdate: (state, action) => {
-      state.user.email.value = !action.payload;
+    emailUpdate: (state, action) => {
+      state.user.email = action.payload;
     },
     usernameUpdate: (state, action) => {
-      state.value = false;
+      state.user.username = action.payload;
+    },
+    nameUpdate: (state, action) => {
+      state.user.name = action.payload;
+    },
+    ageUpdate: (state, action) => {
+      state.user.age = 32;
+      // have to convert string to date, then date calculation to get age
+      // use moment.js maybe
+    },
+    cityUpdate: (state, action) => {
+      state.user.city = action.payload;
+    },
+    descUpdate: (state, action) => {
+      state.user.desc = action.payload;
+    },
+    genderUpdate: (state, action) => {
+      state.user.gender = action.payload;
+    },
+    sportsUpdate: (state, action) => {
+      state.user.sports = [action.payload];
+    },
+    activitiesUpdate: (state, action) => {
+      state.user.activities = [action.payload];
     },
   },
 });
 
-export const { emmailUpdate, usernameUpdate } = userSlice.actions;
+export const {
+  emailUpdate,
+  usernameUpdate,
+  nameUpdate,
+  cityUpdate,
+  ageUpdate,
+  descUpdate,
+  genderUpdate,
+  sportsUpdate,
+  activitiesUpdate,
+} = userSlice.actions;
 export default userSlice.reducer;

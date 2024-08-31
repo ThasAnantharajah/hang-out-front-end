@@ -49,8 +49,8 @@ const FriendsScreen = () => {
         </View>
       </Modal>
       <View style={styles.title}>
-        <Text style={{ fontSize: 25, fontWeight: "bold", color: "white" }}>
-          Mes amis
+        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+          Friends
         </Text>
       </View>
 
@@ -238,13 +238,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: Platform.OS === "android" ? 35 : 0,
-    backgroundColor: "#9660DA",
+    backgroundColor: "#4B3196",
   },
 
   title: {
     height: "auto",
     width: "100%",
-    backgroundColor: "#9660DA",
+    backgroundColor: "#4B3196",
     alignItems: "center",
     paddingBottom: 10,
   },

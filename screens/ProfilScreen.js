@@ -10,21 +10,44 @@ import {
   Platform,
 } from "react-native";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const ProfilScreen = () => {
-  const [userInfo, setUserInfo] = useState([]);
+  // const [userInfo, setUserInfo] = useState([]);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     fetch("http://localhost:3000/users/search")
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         console.log("USER INFO", data);
+  //         setUserInfo(data.userList);
+  //         console.log(userInfo);
+  //       });
+  //   })();
+  // }, []);
+
+  const dispatch = useDispatch();
+  const userInfos = useSelector((state) => state.user.user);
 
   useEffect(() => {
     (async () => {
-      fetch("http://localhost:3000/users/search")
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("USER INFO", data);
-          setUserInfo(data.userList);
-          console.log(userInfo);
-        });
+      console.log("Username stored in redux:", usernameLogged);
+      console.log(
+        "User infos stored in redux:",
+        "USERNAME:",
+        userInfos.username,
+        "GENDER:",
+        userInfos.gender,
+        "SPORTS:",
+        userInfos.sports,
+        "ACTIVITIES:",
+        userInfos.activities,
+        "EMAIL:",
+        userInfos.email
+      );
     })();
   }, []);
 
@@ -56,13 +79,13 @@ const ProfilScreen = () => {
               <Text
                 style={{ fontWeight: "bold", fontSize: 18, marginRight: 5 }}
               >
-                {userInfo.username}
+                {userInfos.name}
               </Text>
               <View style={{ backgroundColor: "#4B3196", borderRadius: "50%" }}>
                 <FontAwesome style={styles.check} name="check" />
               </View>
             </View>
-            <Text style={{ fontSize: 18 }}>32 ans</Text>
+            <Text style={{ fontSize: 18 }}>{userInfos.age}</Text>
           </View>
 
           <View
@@ -73,7 +96,7 @@ const ProfilScreen = () => {
             }}
           >
             <Text style={{ color: "#9480BC", fontSize: 18, marginRight: 5 }}>
-              Nice
+              {userInfos.city}
             </Text>
             <TouchableOpacity>
               <FontAwesome
@@ -84,8 +107,7 @@ const ProfilScreen = () => {
           </View>
 
           <Text style={{ marginTop: 10, marginBottom: 10 }}>
-            Esprit libre en quête de moments de détente et de discution
-            enrichissante. Au plaisire d'échanger rapidement 😏
+            {userInfos.desc}
           </Text>
         </View>
         <ScrollView>
@@ -99,7 +121,7 @@ const ProfilScreen = () => {
                   marginBottom: 15,
                 }}
               >
-                Intérês & Sport
+                Intérêts & Sport
               </Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
                 <View style={styles.rounded}>
@@ -132,7 +154,7 @@ const ProfilScreen = () => {
               </View>
             </View>
 
-            <View style={styles.pref}>
+            {/* <View style={styles.pref}>
               <Text
                 style={{
                   fontSize: 18,
@@ -145,7 +167,7 @@ const ProfilScreen = () => {
                 Préferences
               </Text>
               <Text style={{ color: "grey" }}>Athée</Text>
-            </View>
+            </View> */}
 
             <View style={styles.review}>
               <Text
@@ -157,7 +179,7 @@ const ProfilScreen = () => {
                   marginBottom: 15,
                 }}
               >
-                Ce que les autre pensent
+                Ce que les autres pensent
               </Text>
               <View
                 style={{

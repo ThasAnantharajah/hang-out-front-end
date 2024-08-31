@@ -50,9 +50,9 @@ const EventsScreen = ({ navigation }) => {
   };
 
   const displayDate = (date) => {
-    const day = String(date.getDate()).padStart(2, "0"); // Day of the month (1-31)
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed in JavaScript, so add 1
-    const year = String(date.getFullYear()).slice(-2); // Get the last two digits of the year
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(-2);
 
     return `${day}/${month}/${year}`;
   };
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingRight: 14,
     paddingLeft: 14,
-
+    height: 45,
     borderWidth: 0.5,
     borderColor: "#D8D8D8",
 
