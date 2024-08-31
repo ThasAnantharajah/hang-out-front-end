@@ -19,7 +19,6 @@ const HomeScreen = () => {
 
   useEffect(() => {
     (async () => {
-      console.log("Username stored in redux:", usernameLogged);
       console.log(
         "User infos stored in redux:",
         "USERNAME:",

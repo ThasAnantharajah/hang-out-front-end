@@ -11,6 +11,7 @@ const initialState = {
     age: "",
     city: "",
     desc: "",
+    photo: "", // url to update
   },
 };
 
@@ -47,6 +48,9 @@ export const userSlice = createSlice({
     activitiesUpdate: (state, action) => {
       state.user.activities = [action.payload];
     },
+    photoUpdate: (state, action) => {
+      state.user.photo = action.payload;
+    },
   },
 });
 
@@ -60,5 +64,6 @@ export const {
   genderUpdate,
   sportsUpdate,
   activitiesUpdate,
+  photoUpdate,
 } = userSlice.actions;
 export default userSlice.reducer;

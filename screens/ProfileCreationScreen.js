@@ -28,6 +28,7 @@ import {
   ageUpdate,
   cityUpdate,
   descUpdate,
+  photoUpdate,
 } from "../reducers/user";
 
 import {
@@ -173,7 +174,7 @@ const ProfileCreationScreen = ({ navigation }) => {
             });
         });
     })();
-  }, [usernameLogged]);
+  }, []);
 
   // UPDATE USER FUNCTION WITH PUT METHOD
   const userInfos = useSelector((state) => state.user.user);
@@ -210,9 +211,9 @@ const ProfileCreationScreen = ({ navigation }) => {
     dispatch(ageUpdate(birthdate));
     dispatch(cityUpdate(city));
     dispatch(descUpdate(description));
-
     dispatch(sportsUpdate(sportsList));
     dispatch(activitiesUpdate(activitiesList));
+    dispatch(photoUpdate(profilePic));
   };
 
   return (
@@ -299,7 +300,7 @@ const ProfileCreationScreen = ({ navigation }) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={80}
+        // keyboardVerticalOffset={60}
       >
         <SafeAreaView style={styles.container}>
           <View style={styles.title}>
@@ -692,6 +693,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Platform.OS === "android" ? 35 : 0,
     backgroundColor: "#4B3196",
+    height: "100%",
   },
   camera: {
     height: "100%",
