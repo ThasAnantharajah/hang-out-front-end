@@ -20,7 +20,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hangout.HANGOUTFRONTEND"
     },
     "android": {
       "adaptiveIcon": {
@@ -42,6 +43,7 @@
     },
     "updates": {
       "url": "https://u.expo.dev/5dc858e5-789b-4533-9638-f03743729bb0"
-    }
+    },
+    "owner": "hang-out"
   }
 }
