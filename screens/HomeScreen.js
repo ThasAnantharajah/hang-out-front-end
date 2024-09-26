@@ -17,23 +17,23 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
   const userInfos = useSelector((state) => state.user.user);
 
-  useEffect(() => {
-    (async () => {
-      console.log(
-        "User infos stored in redux:",
-        "USERNAME:",
-        userInfos.username,
-        "GENDER:",
-        userInfos.gender,
-        "SPORTS:",
-        userInfos.sports,
-        "ACTIVITIES:",
-        userInfos.activities,
-        "EMAIL:",
-        userInfos.email
-      );
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     // console.log(
+  //     //   "User infos stored in redux:",
+  //     //   "USERNAME:",
+  //     //   userInfos.username,
+  //     //   "GENDER:",
+  //     //   userInfos.gender,
+  //     //   "SPORTS:",
+  //     //   userInfos.sports,
+  //     //   "ACTIVITIES:",
+  //     //   userInfos.activities,
+  //     //   "EMAIL:",
+  //     //   userInfos.email
+  //     // );
+  //   })();
+  // }, []);
 
   return (
     <SafeAreaView style={{ alignItems: "center" }}>

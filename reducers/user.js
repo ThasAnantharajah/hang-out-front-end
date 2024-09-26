@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   user: {
+    userId: "",
     username: "",
     email: "",
     name: "",
@@ -11,8 +12,13 @@ const initialState = {
     age: "",
     city: "",
     desc: "",
-    photo: "", // url to update
+    photo: "",
+    chatScreenName:"",
+    userprofilePic,
+    receiverPhoto,
+    
   },
+   
 };
 
 export const userSlice = createSlice({
@@ -51,6 +57,27 @@ export const userSlice = createSlice({
     photoUpdate: (state, action) => {
       state.user.photo = action.payload;
     },
+    friendsUpdate: (state, action) => {
+      state.user.friends = action.payload;
+    },
+    updateUserId: (state, action) => {
+      state.user.userId = action.payload;
+    },
+    friendsNameUpdate: (state, action) => {
+      state.user.friendsInfos.name = action.payload;
+    },
+    chatName: (state, action) => {
+      state.user.chatScreenName = action.payload;
+    },
+    userprofilePic: (state, action) => {
+      state.user.userprofilePic = action.payload;
+    },
+    receiverPhoto: (state,action) => {
+      state.user.receiverPhoto = action.payload
+    }
+
+   
+
   },
 });
 
@@ -65,5 +92,13 @@ export const {
   sportsUpdate,
   activitiesUpdate,
   photoUpdate,
+  friendsUpdate,
+  updateUserId,
+  friendsNameUpdate,
+  friendsIdUpdate,
+  chatName,
+  userprofilePic,
+  receiverPhoto
+
 } = userSlice.actions;
 export default userSlice.reducer;

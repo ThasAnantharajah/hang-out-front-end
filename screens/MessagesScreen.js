@@ -1,248 +1,422 @@
-// import React from "react";
-// import {
-//   Text,
-//   View,
-//   TouchableOpacity,
-//   StyleSheet,
-//   SafeAreaView,
-//   Image,
-//   Platform,
-//   Modal,
-//   ImageBackground,
-// } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  SafeAreaView,
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  KeyboardAvoidingView,
+  Image,
+} from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import moment from "moment";
+import "moment/locale/fr";
+import io from "socket.io-client";
+import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { BACK_END_URL } from "../config";
+import { useFocusEffect } from '@react-navigation/native';
 
 
 
-// import { useState } from "react";
 
-// const MessagesScreen = () => {
-//   const [showModal, setShowModal] = useState(false);
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-     
-//       <View style={styles.title}>
-//         <Text style={{ fontSize: 25, fontWeight: "bold", color: "white" }}>
-//           Mes messages
-//         </Text>
-//       </View>
-
-    
-
-//       <View style={{flex:1}}>
-//         <ImageBackground source={require('../assets/backgrounds/background.jpeg')} style={{flex:1}}>
-
-//         </ImageBackground>
-        
-//       </View>
-//     </SafeAreaView>
-//   );
-// };
-
-// export default MessagesScreen;
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     paddingTop: Platform.OS === "android" ? 35 : 0,
-//     backgroundColor: "#9660DA",
-//   },
-
-//   title: {
-//     height: "auto",
-//     width: "100%",
-//     backgroundColor: "#9660DA",
-//     alignItems: "center",
-//     paddingBottom: 10,
-//   },
-
-//   msgContainair: {
-//     flex: 1,
-//     backgroundColor: "white",
-//     alignItems: "center",
-//     paddingTop: 28,
-//     paddingBottom: 28,
-//     paddingRight: 28,
-//     paddingLeft: 28,
-//   },
-
-//   friendsContainer: {
-//     height: "20%",
-//     width: "100%",
-//     backgroundColor: "#D8D8D8",
-//     borderRadius: 25,
-//     borderWidth: 2.5,
-//     borderColor: "#4B3196",
-//     marginBottom: 30,
-//   },
-
-//   img: {
-//     height: 60,
-//     width: 60,
-//     borderRadius: 50,
-//     borderWidth: 2.5,
-//     borderColor: "#8F5CD1",
-//     position: "absolute",
-//     marginTop: -20,
-//     marginLeft: -20,
-//   },
-
-//   nbrMessage: {
-//     fontSize: 12,
-//     color: "white",
-//     backgroundColor: "#4B3196",
-//     padding: 5,
-//     borderRadius: 10,
-//     marginTop: -5,
-//   },
-//   interestContainer: {
-//     marginTop: 20,
-//     paddingLeft: 40,
-//     flexDirection: "row",
-//   },
-//   interest: {
-//     backgroundColor: "#AA8BD4",
-//     borderRadius: 50,
-//     paddingTop: 3,
-//     paddingBottom: 3,
-//     paddingRight: 8,
-//     paddingLeft: 8,
-//   },
-//   msg: {
-//     backgroundColor: "white",
-//     borderRadius: 50,
-//     paddingTop: 3,
-//     paddingBottom: 3,
-//     paddingRight: 8,
-//     paddingLeft: 8,
-//     marginRight: 20,
-//   },
-//   delete: {
-//     backgroundColor: "white",
-//     borderRadius: 50,
-//     paddingTop: 3,
-//     paddingBottom: 3,
-//     paddingRight: 8,
-//     paddingLeft: 8,
-//   },
-//   modal: {
-//     flex:1,
-//     justifyContent:'center',
-//     alignItems:'center',
-    
-   
-//   },
-//   modalWindow:{
-//     height: 150,
-//     width: "90%",
-//     borderRadius: 25,
-//     borderWidth: 2.5,
-//     borderColor: "#4B3196",
-//     backgroundColor:'white',
-//     justifyContent:'space-around',
-//     alignItems:'center',
-//     padding:20
-//   },
-//   modalBtns:{
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     width:'80%'
-//   },
-//   vBtn:{
-//     alignItems:'center',
-//     width:'40%',
-//     borderRadius: 15,
-//     padding:10,
-//     backgroundColor:'#AA8BD4',
-//   },
-//   cBtn:{
-//     alignItems:'center',
-//     width:'40%',
-//     borderRadius: 15,
-//     padding:10,
-//     backgroundColor:'#4B3196',
-//   }
-
-// });
-
-
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList } from 'react-native';
-
-import { useSelector } from 'react-redux';
-
-const ChatScreen = ({ route }) => {
-  // const { userId } = route.params;
+const MessagesScreen = ({ route }) => {
+  const navigation = useNavigation();
+  const nameChat = useSelector((state) => state.user.user.chatScreenName);
+  const receiverPhoto = useSelector((state) => state.user.user.receiverPhoto);
+  const { senderId, receiverId } = route.params;
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [myUserId] = useState('123'); // Remplacez par l'ID de l'utilisateur actuel
-  const userid = useSelector((state)=> state.userId.value)
-  useEffect(() => {
-    // Récupérer les messages de l'utilisateur
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/messages/${userId}`);
-        const data = await response.json();
-        setMessages(data);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des messages :', error);
-      }
-    };
+  const [newMessage, setNewMessage] = useState("");
+  const [socket, setSocket] = useState(null);
+  const [isScreenFocused, setIsScreenFocused] = useState(false);  // Pour savoir si l'utilisateur est sur cet écran
 
-    fetchMessages();
-  }, [userId]);
 
-  const handleSendMessage = async () => {
-    if (newMessage.trim()) {
-      try {
-        const response = await fetch('http://localhost:3000/send-message', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            senderId: myUserId,
-            receiverId: userId,
-            text: newMessage,
-          }),
-        });
 
-        if (response.ok) {
-          const message = await response.json();
-          setMessages([...messages, { senderId: myUserId, receiverId: userId, text: newMessage, createdAt: new Date() }]);
-          setNewMessage('');
-        } else {
-          console.error('Erreur lors de l\'envoi du message');
-        }
-      } catch (error) {
-        console.error('Erreur lors de l\'envoi du message :', error);
-      }
+  const fetchMessages = async () => {
+    try {
+      const response = await fetch(`${BACK_END_URL}/messages/discution/${senderId}/${receiverId}`);
+      const data = await response.json();
+      setMessages(data.messages);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des messages :", error);
     }
   };
 
+  useEffect(() => {
+  const connectSocket = async () => {
+    try {
+      const newSocket = io(BACK_END_URL);
+      setSocket(newSocket);
+
+      // Envoyer l'ID de l'utilisateur lorsqu'il se connecte
+      newSocket.emit('userConnected', senderId);
+
+      // Gérer les messages reçus
+      newSocket.on('messageReceived', (data) => {
+        setMessages((prevMessages) => [...prevMessages, data]);
+
+        // Marquer le message comme lu localement si applicable
+     
+        if (isScreenFocused && data.receiverId === senderId) {
+            markMessageAsRead(data._id);  // Vous devez envoyer l'ID du message
+            console.log('Message lu');
+          }
+      });
+    } catch (error) {
+      console.error("Erreur de connexion au socket :", error);
+    }
+  };
+
+  connectSocket();
+fetchMessages();
+  return () => {
+    if (socket) {
+      socket.disconnect();
+    }
+  };
+  
+}, [receiverId, senderId]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setIsScreenFocused(true);  // Utilisateur entre dans l'écran
+ 
+
+       // Notify the server that the user is viewing the conversation
+    if (socket) {
+      socket.emit('viewingMessages', { userId: senderId, receiverId });
+    }
+
+      return () => {
+        setIsScreenFocused(false);  // Utilisateur quitte l'écran
+         if (socket) {
+        socket.emit('stoppedViewingMessages', { userId: senderId, receiverId });
+      }
+      };
+    }, [socket])
+  );
+
+
+
+
+  // Function to potentially mark a message as read on the server (add implementation based on your server API)
+  const markMessageAsRead = async (messageId) => {
+   
+    try {
+      //  fetch(`<span class="math-inline">\{BACK\_END\_URL\}/messages/</span>{messageId}`
+      const response = await fetch(`${BACK_END_URL}/messages/${messageId}`, { 
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ read: true }),
+      });
+
+      if (response.ok) {
+        console.log("Message marked as read successfully"); // Handle success (optional)
+      } else {
+        console.error("MessageScreen Error marking message as read:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching message:", error);
+    }
+  };
+
+  //   const sendMessage = () => {
+  //   if (socket && newMessage) {
+  //     socket.emit("sendMessage", { senderId, receiverId, content: newMessage });
+  //     setNewMessage("");
+  //   }
+  // };
+
+
+  const sendMessage = () => {
+  if (socket && newMessage) {
+    const messageData = { senderId, receiverId, content: newMessage };
+    socket.emit("sendMessage", messageData); // Émettre le message
+    setMessages((prevMessages) => [...prevMessages, { ...messageData, _id: Date.now(), timestamp: Date.now() }]); // Ajouter le message localement pour l'affichage
+    setNewMessage(""); // Réinitialiser le champ de saisie
+  }
+};
+
+
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={{ padding: 10, alignSelf: item.senderId === myUserId ? 'flex-end' : 'flex-start' }}>
-            <Text>{item.text}</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.title}>
+        <TouchableOpacity onPress={() => navigation.navigate("Friends")}>
+          <FontAwesome
+            style={{
+              color: "white",
+              fontSize: 35,
+              marginRight: 160,
+              marginLeft: 10,
+            }}
+            name="angle-left"
+          />
+        </TouchableOpacity>
+        <Text style={{ fontSize: 25, fontWeight: "bold", color: "white", alignSelf: "center" }}>
+          {nameChat}
+        </Text>
+      </View>
+      <View style={{ flex: 1, justifyContent: "space-between", backgroundColor: "white" }}>
+        <View style={{ flex: 1 }}>
+          <FlatList
+           
+            data={messages}
+            keyExtractor={(item, index) => `${item._id}-${index}`}
+            renderItem={({ item, index }) =>
+              item.sender === senderId ? (
+                <View style={styles.messageSendContainer} key={`${item._id}-${index}`}>
+                  <View style={styles.messagesSend}>
+                    <Text style={{ color: "black" }}>{item.content}</Text>
+                  </View>
+                  <Text style={{ color: "black", alignSelf: "flex-end", marginRight: 20, marginTop: 10 }}>
+                    {moment(item.timestamp).fromNow()}
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.messageReceiveContainer} key={`${item._id}-${index}`}>
+                  <View style={{ alignSelf: "flex-start" }}>
+                    <Image style={styles.img} source={{ uri: receiverPhoto }} />
+                  </View>
+                  <View style={{ paddingTop: 15 }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 10 }}>
+                      <Text style={{ color: "dodgerblue", fontWeight: "600" }}>{nameChat}</Text>
+                      <Text style={{ color: "black" }}>{moment(item.timestamp).fromNow()}</Text>
+                    </View>
+                    <View style={styles.messagesReceive}>
+                      <Text style={{ color: "black" }}>{item.content}</Text>
+                    </View>
+                  </View>
+                </View>
+              )
+            }
+          />
+        </View>
+        <KeyboardAvoidingView
+          behavior="padding"
+          keyboardVerticalOffset={94}
+          style={{ width: "100%", justifyContent: "center", flexDirection: "row", alignItems: "center" }}
+        >
+          <View style={styles.sendItems}>
+            <TouchableOpacity
+              style={{
+                height: 50,
+                color: "white",
+                backgroundColor: "white",
+                marginRight: -130,
+                marginLeft:10,
+                borderRadius: "50%",
+                padding: 10,
+              }}
+              
+            >
+              <FontAwesome style={{ fontSize: 40, color: "#9660DA" }} name="smile-o" />
+            </TouchableOpacity>
+            <TextInput
+              style={{ width: "100%", fontSize: 20 }}
+              placeholder="Tapez votre message"
+              value={newMessage}
+              onChangeText={setNewMessage}
+            
+            />
+            <TouchableOpacity
+              style={{
+                height: 50,
+                color: "white",
+                backgroundColor: "#9660DA",
+                marginLeft: -130,
+                borderRadius: "50%",
+                padding: 10,
+              }}
+              onPress={sendMessage}
+            >
+              <FontAwesome style={{ fontSize: 30, color: "white" }} name="send" />
+            </TouchableOpacity>
           </View>
-        )}
-      />
-      <TextInput
-        style={{ borderWidth: 1, padding: 10, marginVertical: 10 }}
-        value={newMessage}
-        onChangeText={setNewMessage}
-        placeholder="Écrire un message..."
-      />
-      <Button title="Envoyer" onPress={handleSendMessage} />
-      <TouchableOpacity>
-        <Text>TEST</Text>
-      </TouchableOpacity>
-    </View>
+        </KeyboardAvoidingView>
+      </View>
+    </SafeAreaView>
   );
 };
 
-export default ChatScreen;
+export default MessagesScreen;
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#9660DA",
+  },
+  title: {
+    height: "auto",
+    width: "100%",
+    backgroundColor: "#9660DA",
+    paddingBottom: 10,
+    flexDirection: "row",
+  },
+  sendItems: {
+    flexDirection: "row",
+    alignSelf: "center",
+    justifyContent: "space-between",
+    width: "95%",
+    height: 50,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: "#9660DA",
+    position: "relative",
+    backgroundColor: "white",
+    height: 60,
+  },
+  messageSendContainer: {
+    marginTop: 20,
+    justifyContent: "flex-end",
+    flexDirection: "row",
+    marginBottom: 20,
+    marginLeft: 20,
+    alignItems: "center",
+    flexDirection: "column",
+    alignContent: "flex-end",
+    alignSelf: "flex-end",
+  },
+  img: {
+    height: 55,
+    width: 55,
+    borderRadius: 20,
+    borderWidth: 2.5,
+    borderColor: "#8F5CD1",
+    marginRight: 10,
+  },
+  messagesSend: {
+    shadowColor: "#000000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 4.59,
+    elevation: 5,
+    height: 55,
+    backgroundColor: "white",
+    alignSelf: "flex-start",
+    width: "auto",
+    padding: 15,
+    borderRadius: 15,
+    justifyContent: "center",
+    marginRight: 20,
+  },
+  messageReceiveContainer: {
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 20,
+  },
+  messagesReceive: {
+    shadowColor: "#000000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 4.59,
+    elevation: 5,
+    height: 55,
+    backgroundColor: "#F2F3F5",
+    alignSelf: "flex-end",
+    width: "auto",
+    padding: 15,
+    borderRadius: 15,
+    justifyContent: "center",
+    minWidth: 100,
+  },
+  emojiModal: {
+    flex: 1,
+    width: "95%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+    height: 475,
+    backgroundColor: "dodgerblue",
+  },
+});
+
+
+
+
+
+
+
+
+
+  // useEffect(() => {
+  //   const connectSocket = () => {
+  //     try {
+  //       const newSocket = io(BACK_END_URL);
+  //       setSocket(newSocket);
+  //       newSocket.on("messageReceived", (data) => {
+  //         setMessages((prevMessages) => [...prevMessages, data]);
+  //       });
+  //       return () => {
+  //         if (newSocket) {
+  //           newSocket.off("messageReceived");
+  //           newSocket.disconnect();
+  //         }
+  //       };
+  //     } catch (error) {
+  //       console.error("Erreur de connexion au socket :", error);
+  //     }
+  //   };
+  //   connectSocket();
+  // }, []);
+
+  
+
+  // const fetchMessages = async () => {
+  //   try {
+  //     const response = await fetch(`${BACK_END_URL}/messages/discution/${senderId}/${receiverId}`);
+  //     const data = await response.json();
+  //     setMessages(data.messages);
+  //   } catch (error) {
+  //     console.error("Erreur lors de la récupération des messages :", error);
+  //   }
+  // };
+
+  // const sendMessage = () => {
+  //   if (socket && newMessage) {
+  //     socket.emit("sendMessage", { senderId, receiverId, content: newMessage });
+  //     setNewMessage("");
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchMessages();
+   
+  
+  // }, []);
+
+  //  useEffect(() => {
+  //   const connectSocket = async () => {
+  //     try {
+  //       const newSocket = io(BACK_END_URL);
+  //       setSocket(newSocket);
+
+  //       // Handle incoming messages
+  //       newSocket.on("messageReceived", (data) => {
+  //         console.log('data',data)
+  //         setMessages((prevMessages) => [...prevMessages, data]);
+  //         // Mark the received message as read if applicable (implement based on your server logic)
+  //         markMessageAsRead(data.senderId); // Potential addition
+  //       });
+
+       
+  //     } catch (error) {
+  //       console.error("Erreur de connexion au socket :", error);
+  //     }
+  //   };
+  //   connectSocket();
+
+  //   // Fetch messages on initial render
+  //   fetchMessages();
+  //  }, [receiverId]); // Dependency includes receiverId
