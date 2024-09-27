@@ -35,6 +35,7 @@ import {
   SelectList,
   MultipleSelectList,
 } from "react-native-dropdown-select-list";
+import moment from 'moment';
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -71,63 +72,63 @@ const ProfileCreationScreen = ({ navigation }) => {
   ];
 
   const dispatch = useDispatch();
+// CONFLICT KEPT IN CASE
+  // let cameraRef = useRef(null);
 
-  let cameraRef = useRef(null);
+  // const handleImgPicker = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+  // };
 
-  const handleImgPicker = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-  };
+  // const takePicture = async () => {
+  //   console.log("takepicture");
+  //   const photo = await cameraRef.takePictureAsync({ quality: 0.3 });
 
-  const takePicture = async () => {
-    console.log("takepicture");
-    const photo = await cameraRef.takePictureAsync({ quality: 0.3 });
+  //   if (photo) {
+  //     const formData = new FormData();
 
-    if (photo) {
-      const formData = new FormData();
+  //     formData.append("photoFromFront", {
+  //       uri: photo.uri,
+  //       name: "profilePicture.jpg",
+  //       type: "image/jpeg",
+  //     });
 
-      formData.append("photoFromFront", {
-        uri: photo.uri,
-        name: "profilePicture.jpg",
-        type: "image/jpeg",
-      });
+  //     fetch(BACK_END_URL + `/upload`, {
+  //       method: "POST",
+  //       body: formData,
+  //     })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         if (data.result) {
+  //           // dispatch(addPhoto(data.url));
+  //           setImage(data.url);
+  //           setProfilePic(data.url);
+  //         }
+  //       });
+  //   }
+  // };
 
-      fetch(BACK_END_URL + `/upload`, {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.result) {
-            // dispatch(addPhoto(data.url));
-            setImage(data.url);
-            setProfilePic(data.url);
-          }
-        });
-    }
-  };
+  // const handleCamera = () => {
+  //   setShowCamera(!showCamera);
+  //   setShowModal(true);
+  // };
 
-  const handleCamera = () => {
-    setShowCamera(!showCamera);
-    setShowModal(true);
-  };
+  // const handleDate = (input) => {
+  //   let slashedDate;
 
-  const handleDate = (input) => {
-    let slashedDate;
+  //   if (input.length === 8) {
+  //     slashedDate = `${input.slice(0, 2)}/${input.slice(2, 4)}/${input.slice(
+  //       -4
+  //     )}`;
+  //   }
+  //   setBirthdate(slashedDate);
 
-    if (input.length === 8) {
-      slashedDate = `${input.slice(0, 2)}/${input.slice(2, 4)}/${input.slice(
-        -4
-      )}`;
-    }
-    setBirthdate(slashedDate);
-
-    console.log(birthdate);
-  };
+  //   console.log(birthdate);
+  // };
 
   useEffect(() => {
     (async () => {
@@ -158,7 +159,7 @@ const ProfileCreationScreen = ({ navigation }) => {
             key: i,
             value: activity.name,
           }));
-          // console.log("activityArray:", activityArray);
+         
           setActivitiesList(activityArray);
 
           fetch("https://hang-out-back-end.vercel.app/sports")
@@ -175,6 +176,75 @@ const ProfileCreationScreen = ({ navigation }) => {
     })();
   }, []);
 
+
+let cameraRef = useRef(null);
+
+const handleCamera = () => {
+    setShowCamera(!showCamera);
+    setShowModal(true);
+};
+
+const takePicture = async () => {
+    const photo = await cameraRef.takePictureAsync({ quality: 0.3 });
+
+    if (photo) {
+      uploadPicture(photo.uri, "image/jpeg");
+    }
+  };
+
+const handleImgPicker = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const file = result.assets[0];
+      uploadPicture(file.uri, file.mimeType);
+    }
+  };
+
+const uploadPicture = (uri, type) => {
+    const formData = new FormData();
+    formData.append("photoFromFront", {
+      uri,
+      name: "profilePicture.jpg",
+      type,
+    });
+
+    fetch(BACK_END_URL + `/upload`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data.url)
+        if (data.result) {
+          
+          setImage(data.url);
+          setProfilePic(data.url);
+        }
+      });
+  };
+
+const handleDate = (input) => {
+    let slashedDate; 
+    if (input.length === 8) {
+      slashedDate = `${input.slice(0, 2)}/${input.slice(2, 4)}/${input.slice(
+        -4
+      )}`;
+    }
+    
+
+    const dateForBack = moment(slashedDate, "DD/MM/YYYY").toDate()
+     console.log(dateForBack)
+    setBirthdate(dateForBack);
+    
+};
+
+
   // UPDATE USER FUNCTION WITH PUT METHOD
   const userInfos = useSelector((state) => state.user.user);
   const usernameLogged = useSelector((state) => state.user.user.username);
@@ -182,7 +252,7 @@ const ProfileCreationScreen = ({ navigation }) => {
   const onSubmit = () => {
     const updateUser = {
       name: name,
-      dateofbirth: birthdate,
+      birthdate: birthdate,
       gender: gender,
       description: description,
       activities: favoriteActivities,
@@ -205,6 +275,8 @@ const ProfileCreationScreen = ({ navigation }) => {
         data,
       }));
     });
+
+    
     dispatch(nameUpdate(name));
     dispatch(genderUpdate(gender));
     dispatch(ageUpdate(birthdate));
@@ -278,7 +350,7 @@ const ProfileCreationScreen = ({ navigation }) => {
 
             <View style={styles.snapContainer}>
               <TouchableOpacity onPress={() => cameraRef && takePicture()}>
-                <FontAwesome name="circle-thin" size={95} color="#ffffff" />
+                <FontAwesome name="circle-o-notch" size={95} color="#ffffff" />
               </TouchableOpacity>
 
               <TouchableOpacity

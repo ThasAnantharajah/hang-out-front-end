@@ -9,16 +9,62 @@ import {
   Platform,
   Modal,
 } from "react-native";
-
+import moment from "moment";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { updateUserId } from "../reducers/users";
+import { useSelector, useDispatch } from "react-redux";
+import { chatName, receiverPhoto } from "../reducers/user";
+import { BACK_END_URL } from "../config";
 
 const FriendsScreen = ({ navigation }) => {
   const [showModal, setShowModal] = useState(false);
+  const user = useSelector((state) => state.user.user.friends);
+  const senderId = useSelector((state) => state.user.user.userId);
+  const dispatch = useDispatch();
+  const ReciveunreadMessages = useSelector(
+    (state) => state.message.receivedMessage
+  );
 
-  const friend = useSelector((state) => state.userIds.userId);
-  console.log("friendscreen:", friend);
+  //   const markMessagesAsRead = async (messageIds) => {
+  //   try {
+  //     for (let messageId of messageIds) {
+  //       console.log('messageids friendsscreen', messageId);
+  //       await fetch(BACK_END_URL + `/messages/markMessages/${messageId}`, {
+  //         method: "PUT",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       });
+  //     }
+  //     console.log("friendsscreen Messages marked as read ");
+  //   } catch (error) {
+  //     console.error("friendsScreen Error marking messages as read:", error);
+  //   }
+  // };
+
+  const markMessagesAsRead = async (messageIds) => {
+    try {
+      for (let messageId of messageIds) {
+        const response = await fetch(
+          `${BACK_END_URL}/messages/markMessages/${messageId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Error marking message ${messageId}: ${response.statusText}`
+          );
+        }
+      }
+      console.log("Messages marked as read");
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -26,7 +72,7 @@ const FriendsScreen = ({ navigation }) => {
         <View style={styles.modal}>
           <View style={styles.modalWindow}>
             <Text style={styles.modalText}> Confirmez-vous supression ? </Text>
-            <Text style={styles.modalName}> Julie</Text>
+            <Text style={styles.modalName}> name</Text>
 
             <View style={styles.modalBtns}>
               <TouchableOpacity style={styles.vBtn}>
@@ -71,178 +117,132 @@ const FriendsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.msgContainair}>
-        <View style={styles.friendsContainer}>
-          <View
-            style={{
-              flexDirection: "row",
-              width: "100%",
-              gap: 274,
-            }}
-          >
-            <View>
-              <Image
-                style={styles.img}
-                source={require("../assets/face.jpg")}
-              ></Image>
-            </View>
-
-            <View style={styles.nbrMessage}>
-              <Text
-                style={{ fontSize: 12, color: "white", alignSelf: "center" }}
+        {user.map((usera) => {
+          const senderid = usera.id._id;
+          const filteredMessages = ReciveunreadMessages.filter(
+            (message) => message.sender === senderid && !message.read
+          );
+          return (
+            <View style={styles.friendsContainer} key={usera.id._id}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  width: "100%",
+                  gap: 274,
+                }}
               >
-                6 messages
-              </Text>
-            </View>
-          </View>
+                <View>
+                  <Image
+                    style={styles.img}
+                    source={{ uri: usera.id.profilePic }}
+                  ></Image>
+                </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              width: "80%",
-              paddingLeft: 64.5,
-              position: "absolute",
-              marginTop: 6,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Julie,</Text>
-            <Text>28 ans</Text>
-          </View>
-          <View style={styles.interestContainer}>
-            <View style={styles.interest}>
-              <Text>Vélo</Text>
-            </View>
-          </View>
-          <Text
-            style={{
-              paddingLeft: 40,
-              marginTop: 7,
-              marginBottom: 7,
-              fontWeight: "bold",
-            }}
-          >
-            Activités ensemple : 3
-          </Text>
+                <View style={styles.nbrMessage}>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: "white",
+                      alignSelf: "center",
+                    }}
+                  >
+                    {filteredMessages.length} messages
+                  </Text>
+                </View>
+              </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              width: "100%",
-              paddingLeft: 40,
-              paddingRight: 40,
-              justifyContent: "space-between",
-            }}
-          >
-            <TouchableOpacity style={styles.msg}>
-              <Text style={{ color: "#9879C3", fontWeight: "bold" }}>
-                Message
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.delete}
-              onPress={() => {
-                setShowModal(true);
-              }}
-            >
-              <Text style={{ color: "#AE6C6B", fontWeight: "bold" }}>
-                Supprimer cet ami
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.friendsContainer}>
-          <View
-            style={{
-              flexDirection: "row",
-              // justifyContent: "space-between",
-              width: "100%",
-              gap: 274,
-            }}
-          >
-            <View>
-              <Image
-                style={styles.img}
-                source={require("../assets/face.jpg")}
-              ></Image>
-            </View>
-
-            <View style={styles.nbrMessage}>
-              <Text
-                style={{ fontSize: 12, color: "white", alignSelf: "center" }}
+              <View
+                style={{
+                  flexDirection: "row",
+                  width: "80%",
+                  paddingLeft: 64.5,
+                  position: "absolute",
+                  marginTop: 6,
+                }}
               >
-                6 messages
+                <Text style={{ fontWeight: "bold" }}>{usera.id.name}, </Text>
+
+                <Text>{moment().diff(usera.id.birthdate, "years")} ans</Text>
+              </View>
+              <View style={styles.interestContainer}>
+                <View style={styles.interest}>
+                  <Text>Vélo</Text>
+                </View>
+              </View>
+              <Text
+                style={{
+                  paddingLeft: 40,
+                  marginTop: 7,
+                  marginBottom: 7,
+                  fontWeight: "bold",
+                }}
+              >
+                Activités ensemple : 3
               </Text>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  width: "100%",
+                  paddingLeft: 40,
+                  paddingRight: 40,
+                  justifyContent: "space-between",
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.msg}
+                  // onPress={() => {
+
+                  //   dispatch(chatName(usera.id.name)) &&
+                  //   dispatch(receiverPhoto(usera.id.profilePic)) &&
+                  //   navigation.navigate("Messages", {
+                  //       senderId: senderId,
+                  //       receiverId: usera.id._id,
+                  //     });
+                  // }}
+
+                  onPress={async () => {
+                    const unreadMessageIds = filteredMessages.map(
+                      (message) => message._id
+                    );
+
+                    // Mark messages as read
+                    await markMessagesAsRead(unreadMessageIds);
+
+                    // Navigate to the Messages screen
+                    dispatch(chatName(usera.id.name));
+                    dispatch(receiverPhoto(usera.id.profilePic));
+                    navigation.navigate("Messages", {
+                      senderId: senderId,
+                      receiverId: usera.id._id,
+                    });
+                  }}
+                >
+                  <Text style={{ color: "#9879C3", fontWeight: "bold" }}>
+                    Message
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.delete}
+                  onPress={() => {
+                    setShowModal(true);
+                  }}
+                >
+                  <Text style={{ color: "#AE6C6B", fontWeight: "bold" }}>
+                    Supprimer cet ami
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          );
+        })}
 
-          <View
-            style={{
-              flexDirection: "row",
-              width: "80%",
-              paddingLeft: 64.5,
-              position: "absolute",
-              marginTop: 6,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Annas,</Text>
-            <Text>28 ans</Text>
-          </View>
-          <View style={styles.interestContainer}>
-            <View style={styles.interest}>
-              <Text>Vélo</Text>
-            </View>
-          </View>
-          <Text
-            style={{
-              paddingLeft: 40,
-              marginTop: 7,
-              marginBottom: 7,
-              fontWeight: "bold",
-            }}
-          >
-            Activités ensemple : 3
-          </Text>
-
-          <View
-            style={{
-              flexDirection: "row",
-              width: "100%",
-              paddingLeft: 40,
-              paddingRight: 40,
-              justifyContent: "space-between",
-            }}
-          >
-            <TouchableOpacity style={styles.msg}>
-              <Text style={{ color: "#9879C3", fontWeight: "bold" }}>
-                Message
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.delete}>
-              <Text style={{ color: "#AE6C6B", fontWeight: "bold" }}>
-                Supprimer cet ami
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
         <Text
           style={{ fontStyle: "italic", textAlign: "center", color: "grey" }}
         >
           Qui dit nouvelles sorties ...{"\n"} dit de nouveaux amis !{"\n"}😊
         </Text>
-        {/* 
-        <Text
-          style={{ fontStyle: "italic", textAlign: "center", color: "grey" }}
-        >
-          {friend}
-        </Text>
-
-        <Text
-          style={{ fontStyle: "italic", textAlign: "center", color: "grey" }}
-        >
-          {friend}
-        </Text> */}
       </View>
     </SafeAreaView>
   );
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   img: {
     height: 60,
     width: 60,
-    borderRadius: 50,
+    borderRadius: 20,
     borderWidth: 2.5,
     borderColor: "#8F5CD1",
     position: "absolute",

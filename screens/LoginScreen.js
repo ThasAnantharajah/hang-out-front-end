@@ -12,18 +12,20 @@ import { Image } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import { useDispatch, useSelector } from "react-redux";
-import { signupState } from "../reducers/signup";
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { BACK_END_URL } from "../config";
 import ProfileCreationScreen from "./ProfileCreationScreen";
 import ProfileScreen from "./ProfileScreen";
-import { updateUserId } from "../reducers/users";
-import { emailUpdate, usernameUpdate } from "../reducers/user";
 
-// import {
-//   GoogleSignin,
-//   GoogleSigninButton,
-// } from "@react-native-google-signin/google-signin";
+import {
+  emailUpdate,
+  usernameUpdate,
+  friendsUpdate,
+  updateUserId,
+  userprofilePic,
+} from "../reducers/user";
+import { nbrOfMessage, receivedMessage } from "../reducers/message";
 
 const regExpMail =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -37,10 +39,9 @@ const LoginScreen = ({ navigation }) => {
   const [errors, setErrors] = useState({});
   const [formValidation, setFormValidation] = useState(false);
   const [loginValidation, setLoginValidation] = useState(false);
-
   const dispatch = useDispatch();
+  const senderId = useSelector((state) => state.user.user.userId);
 
-  const [user, setUser] = useState("");
   const validatePassword = (pwd) => {
     let errorType = "";
 
@@ -99,7 +100,6 @@ const LoginScreen = ({ navigation }) => {
   };
 
   const handleSubmit = () => {
-    console.log("ok");
     if (!formValidation) {
       const data = { username, email, password };
       fetch("https://hang-out-back-end.vercel.app/users/signup", {
@@ -108,33 +108,37 @@ const LoginScreen = ({ navigation }) => {
         body: JSON.stringify(data),
       })
         .then((response) => response.json())
-        .then((data) => {
-          console.log("Adding user done.");
-        });
+        .then((data) => {});
     }
     dispatch(usernameUpdate(username));
     dispatch(emailUpdate(email));
-    console.log("Passed dispatch x2");
+
     navigation.navigate("ProfileCreationScreen");
   };
 
-  //   const validationLogin = () => {
-  //   const isValid =
-  //     !errors.username &&
-  //     username.length >= 4 &&
-  //     !errors.password &&
-  //     /[A-Z]/.test(password) &&
-  //     /[a-z]/.test(password) &&
-  //     /[0-9]{2}/.test(password) &&
-  //     /[!@#$%^&*(),.?":{}|<>]/.test(password) &&
-  //     password.length >= 8;
-  //   setLoginValidation(isValid);
-  // };
+  const handleFetchNbrMessage = () => {
+    fetch(
+      `https://hang-out-back-end.vercel.app/messages/readMessages/${senderId}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data.reciveMessages)) {
+          const messages = data.reciveMessages;
+          dispatch(receivedMessage(messages));
+          dispatch(nbrOfMessage(messages.length));
+        } else {
+          console.log("Le résultat n'est pas un tableau.");
+        }
+      })
+      .catch((error) => console.error("Erreur:", error));
+  };
+
+  // handleFetchNbrMessage()
 
   const handleLogIn = () => {
     if (!loginValidation) {
       const data = { username, password, email };
-      fetch("https://hang-out-back-end.vercel.app/users/login", {
+      fetch(`https://hang-out-back-end.vercel.app/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -142,12 +146,15 @@ const LoginScreen = ({ navigation }) => {
         .then((response) => response.json())
         .then((data) => {
           if (data.token) {
-            console.log("User logged in.");
+            dispatch(userprofilePic(data.profilePic));
             dispatch(updateUserId(data.userId));
             dispatch(usernameUpdate(username));
+            dispatch(friendsUpdate(data.friends));
             dispatch(emailUpdate(email));
-            console.log("Dispatch passed for login.");
-            navigation.navigate("TabNavigator", { screen: "Home" });
+            console.log("User logged in.");
+            handleFetchNbrMessage();
+            navigation.navigate("TabNavigator");
+            console.log("SIGN IN DONE");
           }
         });
     }
@@ -341,7 +348,10 @@ const LoginScreen = ({ navigation }) => {
               {/**********************************Login***********************************/}
               <TouchableOpacity
                 style={styles.signup}
-                onPress={() => handleLogIn()}
+                onPress={() => {
+                  handleLogIn();
+                }}
+
                 // disabled={loginValidation}
               >
                 <Text

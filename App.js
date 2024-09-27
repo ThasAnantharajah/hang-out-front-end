@@ -2,6 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { StyleSheet, View, Text } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import ProfileScreen from "./screens/ProfileScreen";
 import EventsScreen from "./screens/EventsScreen";
@@ -11,7 +12,6 @@ import HomeScreen from "./screens/HomeScreen";
 import ProfileCreationScreen from "./screens/ProfileCreationScreen";
 
 import MessagesScreen from "./screens/MessagesScreen";
-import MessagesListScreen from "./screens/MessageListScreen";
 
 //Google Auth
 import { GoogleLogin } from "@react-oauth/google";
@@ -31,11 +31,22 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 // reducers imports
 import signup from "./reducers/signup";
 import user from "./reducers/user";
-import userIds from "./reducers/users";
+import message from "./reducers/message";
+import { nbrOfMessage} from "./reducers/message";
 
-const reducers = combineReducers({ signup, userIds, user });
+
+const reducers = combineReducers({ signup, user, message });
 const persistConfig = { key: "hangoutStorage", storage: AsyncStorage };
 import { beginAsyncEvent } from "react-native/Libraries/Performance/Systrace";
+
+
+
+// const [number, setNumber] = useState('')
+
+  // useEffect(() => {
+  //    const nbrMessage = useSelector((state) => state.message.message.nbrOfMessage);
+  //    setNumber(nbrMessage)
+  // }, [nbrOfMessage]);
 
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
@@ -62,6 +73,11 @@ const fetchFonts = () => {
 };
 
 const TabNavigator = () => {
+
+
+const nbr = useSelector((state) => state.message.nbrOfMessage);
+console.log('reducer',nbr);
+
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
   useEffect(() => {
@@ -76,6 +92,7 @@ const TabNavigator = () => {
   if (!fontsLoaded) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -139,15 +156,7 @@ const TabNavigator = () => {
                   paddingTop: 2,
                 }}
               />
-              {/* <Text
-                style={{
-                  fontSize: 12,
-                  color: focused ? "#9660DA" : "#767577", // Text color based on focus state
-                  marginTop: 3, // Margin to separate the icon and label
-                }}
-              >
-                {route.name}
-              </Text> */}
+           
             </View>
           );
         },
@@ -212,7 +221,7 @@ const TabNavigator = () => {
       <Tab.Screen
         name="Friends"
         component={FriendsScreen}
-        options={{ tabBarBadge: 3 }}
+        options={{ tabBarBadge: nbr > 0 ? nbr : null }}
       />
       {/* <Tab.Screen name="ProfileCreation" component={ProfileCreationScreen} /> */}
       <Tab.Screen name="Profile" component={ProfileScreen} />
@@ -224,8 +233,10 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
+    
     <Provider store={store}>
       <PersistGate persistor={persistor}>
+        
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={LoginScreen} />
@@ -237,6 +248,7 @@ export default function App() {
 
             <Stack.Screen name="LoginScreen" component={LoginScreen} />
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
+            <Stack.Screen name="Messages" component={MessagesScreen} />
             <Stack.Screen
               name="ProfileCreationScreen"
               component={ProfileCreationScreen}

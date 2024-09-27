@@ -20,9 +20,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
+  
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -43,6 +41,7 @@
     },
     "updates": {
       "url": "https://u.expo.dev/5dc858e5-789b-4533-9638-f03743729bb0"
-    }
+    },
+    "owner": "hang-out"
   }
 }
