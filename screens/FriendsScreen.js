@@ -14,7 +14,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { updateUserId } from "../reducers/users";
 
-const FriendsScreen = () => {
+const FriendsScreen = ({ navigation }) => {
   const [showModal, setShowModal] = useState(false);
 
   const friend = useSelector((state) => state.userIds.userId);
@@ -49,7 +49,23 @@ const FriendsScreen = () => {
         </View>
       </Modal>
       <View style={styles.title}>
-        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("TabNavigator", { screen: "Home" })
+          }
+        >
+          <Image
+            source={require("../assets/logo.png")}
+            style={{
+              width: 40,
+              height: 40,
+              // marginVertical: -100,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          />
+        </TouchableOpacity>
+        <Text style={{ fontSize: 25, fontWeight: "bold", color: "#4B3196" }}>
           Friends
         </Text>
       </View>
@@ -215,7 +231,7 @@ const FriendsScreen = () => {
         >
           Qui dit nouvelles sorties ...{"\n"} dit de nouveaux amis !{"\n"}😊
         </Text>
-
+        {/* 
         <Text
           style={{ fontStyle: "italic", textAlign: "center", color: "grey" }}
         >
@@ -226,7 +242,7 @@ const FriendsScreen = () => {
           style={{ fontStyle: "italic", textAlign: "center", color: "grey" }}
         >
           {friend}
-        </Text>
+        </Text> */}
       </View>
     </SafeAreaView>
   );
@@ -238,15 +254,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: Platform.OS === "android" ? 35 : 0,
-    backgroundColor: "#4B3196",
+    backgroundColor: "#fff",
   },
 
   title: {
-    height: "auto",
     width: "100%",
-    backgroundColor: "#4B3196",
+    backgroundColor: "#fff",
     alignItems: "center",
     paddingBottom: 10,
+    flexDirection: "row",
+    padding: 20,
+    gap: 15,
   },
 
   msgContainair: {

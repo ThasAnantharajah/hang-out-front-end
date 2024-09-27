@@ -16,8 +16,14 @@ import { signupState } from "../reducers/signup";
 import { useState, useEffect } from "react";
 import { BACK_END_URL } from "../config";
 import ProfileCreationScreen from "./ProfileCreationScreen";
+import ProfileScreen from "./ProfileScreen";
 import { updateUserId } from "../reducers/users";
 import { emailUpdate, usernameUpdate } from "../reducers/user";
+
+// import {
+//   GoogleSignin,
+//   GoogleSigninButton,
+// } from "@react-native-google-signin/google-signin";
 
 const regExpMail =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -137,8 +143,11 @@ const LoginScreen = ({ navigation }) => {
         .then((data) => {
           if (data.token) {
             console.log("User logged in.");
-            dispatch(updateUserId(data.userId)) &&
-              navigation.navigate("TabNavigator");
+            dispatch(updateUserId(data.userId));
+            dispatch(usernameUpdate(username));
+            dispatch(emailUpdate(email));
+            console.log("Dispatch passed for login.");
+            navigation.navigate("TabNavigator", { screen: "Home" });
           }
         });
     }
@@ -304,7 +313,6 @@ const LoginScreen = ({ navigation }) => {
                 ) : null}
               </View>
               {/**********************************Password***********************************/}
-
               <View style={styles.inputSection}>
                 <View style={styles.boxContainer}>
                   <FontAwesome style={styles.fontAwesome} name="lock" />
@@ -369,6 +377,12 @@ const LoginScreen = ({ navigation }) => {
                 />
                 <Text style={styles.googleText}>Sign in with Google</Text>
               </TouchableOpacity>
+              {/* <GoogleSigninButton
+                size={GoogleSigninButton.Size.Wide}
+                color={GoogleSigninButton.Color.Dark}
+                onPress={this._signIn}
+                disabled={this.state.isSigninInProgress}
+              /> */}
             </View>
           </View>
         </SafeAreaView>

@@ -6,7 +6,8 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps._some_id_here_"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "name": "HANG-OUT-FRONT-END",
     "slug": "HANG-OUT-FRONT-END",

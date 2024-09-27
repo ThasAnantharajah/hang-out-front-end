@@ -119,10 +119,6 @@ const ProfileCreationScreen = ({ navigation }) => {
   const handleDate = (input) => {
     let slashedDate;
 
-    console.log(input.slice(0, 2));
-    console.log(input.slice(2, 4));
-    console.log(input.slice(-4));
-
     if (input.length === 8) {
       slashedDate = `${input.slice(0, 2)}/${input.slice(2, 4)}/${input.slice(
         -4
@@ -135,9 +131,9 @@ const ProfileCreationScreen = ({ navigation }) => {
 
   useEffect(() => {
     (async () => {
-      console.log("Username stored in redux:", usernameLogged);
+      console.log("LOAD Username stored in redux:", usernameLogged);
       console.log(
-        "User infos stored in redux:",
+        "LOAD User infos stored in redux:",
         "USERNAME:",
         userInfos.username,
         "GENDER:",
@@ -162,14 +158,17 @@ const ProfileCreationScreen = ({ navigation }) => {
             key: i,
             value: activity.name,
           }));
-          console.log("activityArray:", activityArray);
+          // console.log("activityArray:", activityArray);
           setActivitiesList(activityArray);
 
           fetch("https://hang-out-back-end.vercel.app/sports")
             .then((res) => res.json())
             .then((data) => {
-              let sportArray = data.sports.map((sport) => sport.name);
-              console.log("SportArray:", sportArray);
+              let sportArray = data.sports.map((sport, i) => ({
+                key: i,
+                value: sport.name,
+              }));
+              // console.log("SportArray:", sportArray);
               setSportsList(sportArray);
             });
         });
@@ -191,7 +190,7 @@ const ProfileCreationScreen = ({ navigation }) => {
       city: city,
       profilePic: profilePic,
     };
-    console.log("Update info user:", updateUser);
+    console.log("Update info user (profile creation):", updateUser);
 
     fetch(
       `https://hang-out-back-end.vercel.app/users/update/${usernameLogged}`,
@@ -405,14 +404,6 @@ const ProfileCreationScreen = ({ navigation }) => {
                 >
                   Your name
                 </Text>
-                <Text
-                  style={{
-                    fontWeight: "600",
-                    color: "#09051F",
-                    paddingLeft: 4,
-                    marginBottom: 5,
-                  }}
-                ></Text>
                 <TextInput
                   placeholder="Name"
                   returnKeyType="next"
@@ -652,7 +643,7 @@ const ProfileCreationScreen = ({ navigation }) => {
                     style={styles.previousButton}
                     onPress={() => {
                       navigation.navigate("LoginScreen");
-                      console.log(usernameLogged);
+                      console.log("USERNAME LOGGED", usernameLogged);
                     }}
                   >
                     <Text style={styles.buttonText}>Previous</Text>
@@ -663,7 +654,7 @@ const ProfileCreationScreen = ({ navigation }) => {
                       navigation.navigate("TabNavigator");
                       onSubmit();
                       console.log(
-                        "User data:",
+                        "User data ON NEXT:",
                         name,
                         city,
                         description,

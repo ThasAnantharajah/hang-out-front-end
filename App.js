@@ -3,7 +3,7 @@ import { StyleSheet, View, Text } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import ProfilScreen from "./screens/ProfilScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 import EventsScreen from "./screens/EventsScreen";
 import CalendarScreen from "./screens/CalendarScreen";
 import FriendsScreen from "./screens/FriendsScreen";
@@ -22,7 +22,9 @@ import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import * as Font from "expo-font";
+import React, { useState, useEffect } from "react";
+import { ActivityIndicator } from "react-native";
 // import storage from "redux-persist/lib/storage";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
@@ -46,7 +48,34 @@ const persistor = persistStore(store);
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+const fetchFonts = () => {
+  return Font.loadAsync({
+    Roboto: require("./assets/fonts/RobotoRegular.ttf"),
+    RobotoItalic: require("./assets/fonts/RobotoItalic.ttf"),
+    RobotoBold: require("./assets/fonts/RobotoBold.ttf"),
+
+    Manrope: require("./assets/fonts/ManropeRegular.ttf"),
+    ManropeBold: require("./assets/fonts/ManropeBold.ttf"),
+
+    Lato: require("./assets/fonts/LatoRegular.ttf"),
+  });
+};
+
 const TabNavigator = () => {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadFonts = async () => {
+      await fetchFonts();
+      setFontsLoaded(true);
+    };
+
+    loadFonts();
+  }, []);
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -148,6 +177,34 @@ const TabNavigator = () => {
           inactiveBackgroundColor: "grey",
         },
       })}
+
+      // DIFFERENT STYLE
+      //   tabBarStyle: {
+      //     position: "absolute",
+      //     height: 90,
+      //     backgroundColor: "#4B3196",
+      //     // borderTopWidth: 0.5,
+      //     // borderTopColor: "#B090D9",
+      //     paddingBottom: 20,
+      //     paddingTop: 5,
+      //     borderTopLeftRadius: "25%",
+      //     borderTopRightRadius: "25%",
+
+      //     shadowColor: "#767577",
+      //     shadowOffset: { width: -2, height: 10 },
+      //     shadowOpacity: 1,
+      //     shadowRadius: 20,
+      //   },
+      //   tabBarActiveTintColor: "#fff",
+
+      //   tabBarInactiveTintColor: "#B090D9",
+      //   headerShown: false,
+      //   tabBarLabelStyle: { fontWeight: "700", fontSize: 10, marginBottom: 6 },
+      //   tabBarOptions: {
+      //     activeBackgroundColor: "blue",
+      //     inactiveBackgroundColor: "grey",
+      //   },
+      // })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
@@ -158,7 +215,7 @@ const TabNavigator = () => {
         options={{ tabBarBadge: 3 }}
       />
       {/* <Tab.Screen name="ProfileCreation" component={ProfileCreationScreen} /> */}
-      <Tab.Screen name="Profile" component={ProfilScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
       {/* <Tab.Screen name="Messages" component={MessagesScreen} /> */}
       {/* <Tab.Screen name="Messages" component={MessagesListScreen} /> */}
     </Tab.Navigator>
@@ -172,6 +229,12 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={LoginScreen} />
+            <Stack.Screen
+              name="Main"
+              component={TabNavigator}
+              options={{ headerShown: false }}
+            />
+
             <Stack.Screen name="LoginScreen" component={LoginScreen} />
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
             <Stack.Screen
@@ -179,6 +242,8 @@ export default function App() {
               component={ProfileCreationScreen}
             />
             <Stack.Screen name="EventsScreen" component={EventsScreen} />
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+
             <Stack.Screen
               name="EventCreationScreen"
               component={EventCreationScreen}
