@@ -12,6 +12,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
+import moment from "moment";
 
 import {
   SelectList,
@@ -39,9 +40,9 @@ const ProfileScreen = ({ navigation }) => {
   const usernameLogged = useSelector((state) => state.user.user.username);
   const dispatch = useDispatch();
   const userRedux = useSelector((state) => state.user.user);
-  const [showModal, setShowModal] = useState(false);
 
   //MODAL HANDLING
+  const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [city, setCity] = useState("");
@@ -60,40 +61,50 @@ const ProfileScreen = ({ navigation }) => {
   const [sportsList, setSportsList] = useState([]);
   const [activitiesList, setActivitiesList] = useState([]);
 
+  const ageCalc = () => {
+    const now = moment();
+    const birthdateFormatted = moment(userInfo.birthdate).format("YYYY-MM-DD");
+    const userAge = now.diff(birthdateFormatted, "years");
+    return userAge;
+  };
+
   useEffect(() => {
-    (async () => {
-      console.log("Logged user:", usernameLogged);
-      fetch(`http://localhost:3000/users/search/${usernameLogged}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("USER INFO AT LOAD", data);
-          setUserInfo(data.userSearched);
-          updateReduxState(data.userSearched);
-        });
+    console.log("Logged user:", usernameLogged);
+    fetch(`https://hang-out-back-end.vercel.app/users/search/${usernameLogged}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("USER INFO AT LOAD", data);
+        setUserInfo(data.userSearched);
+        // updateReduxState(data.userSearched);
 
-      fetch("https://hang-out-back-end.vercel.app/activities")
-        .then((res) => res.json())
-        .then((data) => {
-          let activityArray = data.activities.map((activity, i) => ({
-            key: i,
-            value: activity.name,
-          }));
-          // console.log("activityArray:", activityArray);
-          setActivitiesList(activityArray);
+        console.log(
+          "Fetched Activities:",
+          data.userSearched.favoriteActivities
+        );
+        console.log("Fetched Sports:", data.userSearched.favoriteSports);
+      });
+    console.log("fav", userInfo.favoriteActivities, userInfo.favoriteSports);
 
-          fetch("https://hang-out-back-end.vercel.app/sports")
-            .then((res) => res.json())
-            .then((data) => {
-              let sportArray = data.sports.map((sport, i) => ({
-                key: i,
-                value: sport.name,
-              }));
-              // console.log("SportArray:", sportArray);
-              setSportsList(sportArray);
-            });
-        });
-    })();
-  }, []);
+    fetch("https://hang-out-back-end.vercel.app/activities")
+      .then((res) => res.json())
+      .then((data) => {
+        let activityArray = data.activities.map((activity, i) => ({
+          key: i,
+          value: activity.name,
+        }));
+        setActivitiesList(activityArray);
+
+        fetch("https://hang-out-back-end.vercel.app/sports")
+          .then((res) => res.json())
+          .then((data) => {
+            let sportArray = data.sports.map((sport, i) => ({
+              key: i,
+              value: sport.name,
+            }));
+            setSportsList(sportArray);
+          });
+      });
+  }, [usernameLogged]);
 
   const updateReduxState = (user) => {
     dispatch(emailUpdate(user.email));
@@ -102,29 +113,30 @@ const ProfileScreen = ({ navigation }) => {
     dispatch(ageUpdate(user.birthdate));
     dispatch(cityUpdate(user.city));
     dispatch(descUpdate(user.desc));
-    dispatch(sportsUpdate(user.sports));
-    dispatch(activitiesUpdate(user.activities));
+    dispatch(sportsUpdate(user.favoriteSports));
+    dispatch(activitiesUpdate(user.favoriteActivities));
     dispatch(photoUpdate(user.profilePic));
   };
 
-  const userFavSportsProfile = userInfo.sports
-    ? userInfo.sports.map((data, i) => (
-        <View key={i} style={styles.rounded}>
-          <Text style={{ color: "#fff" }}>{data}</Text>
+  const userFavSportsProfile = userInfo.favoriteSports
+    ? userInfo.favoriteSports.map((data, i) => (
+        <View key={i} style={styles.roundedS}>
+          <Text style={styles.roundedText}>{data.name}</Text>
         </View>
       ))
     : null;
 
-  const userFavActivitiesProfile = userInfo.activities
-    ? userInfo.activities.map((data, i) => (
-        <View key={i} style={styles.rounded}>
-          <Text style={{ color: "#fff" }}>{data}</Text>
+  const userFavActivitiesProfile = userInfo.favoriteActivities
+    ? userInfo.favoriteActivities.map((data, i) => (
+        <View key={i} style={styles.roundedA}>
+          <Text style={styles.roundedText}>{data.name}</Text>
         </View>
       ))
     : null;
 
   const handleReview = () => {};
 
+  // update user info
   const onSubmit = () => {
     const updateUser = {
       name: name,
@@ -182,7 +194,6 @@ const ProfileScreen = ({ navigation }) => {
       )}`;
     }
     setBirthdate(slashedDate);
-
     console.log(birthdate);
   };
 
@@ -271,7 +282,9 @@ const ProfileScreen = ({ navigation }) => {
                   value={birthdate}
                   onChangeText={(text) => handleDate(text)}
                   placeholder={
-                    userInfo.birthdate ? userInfo.birthdate : "JJ/MM/YYYY"
+                    userInfo.birthdate
+                      ? moment(userInfo.birthdate).format("DD/MM/YYYY")
+                      : "DD/MM/YYYY"
                   }
                   placeholderTextColor={userInfo.birthdate ? "grey" : "#C8C8C8"}
                   keyboardType="numeric"
@@ -539,7 +552,12 @@ const ProfileScreen = ({ navigation }) => {
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text
-                style={{ fontWeight: "bold", fontSize: 18, marginRight: 5 }}
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 18,
+                  marginRight: 5,
+                  fontFamily: "ManropeBold",
+                }}
               >
                 {userInfo.name}
               </Text>
@@ -547,7 +565,9 @@ const ProfileScreen = ({ navigation }) => {
                 <FontAwesome style={styles.check} name="check" />
               </View>
             </View>
-            <Text style={{ fontSize: 18 }}>{userInfo.birthdate}</Text>
+            <Text style={{ fontSize: 18, fontFamily: "Roboto", fontSize: 17 }}>
+              {ageCalc()} years
+            </Text>
           </View>
 
           <View
@@ -555,9 +575,17 @@ const ProfileScreen = ({ navigation }) => {
               flexDirection: "row",
               justifyContent: "space-between",
               width: "100%",
+              paddingTop: 5,
             }}
           >
-            <Text style={{ color: "#9480BC", fontSize: 18, marginRight: 5 }}>
+            <Text
+              style={{
+                color: "#9480BC",
+                fontSize: 18,
+                marginRight: 5,
+                fontFamily: "RobotoBold",
+              }}
+            >
               {userInfo.city}
             </Text>
             <TouchableOpacity>
@@ -570,13 +598,20 @@ const ProfileScreen = ({ navigation }) => {
               />
             </TouchableOpacity>
           </View>
-
-          <Text style={{ marginTop: 20, marginBottom: 10, fontSize: 17 }}>
-            {userInfo.description}
-          </Text>
         </View>
         <ScrollView>
           <View>
+            <Text
+              style={{
+                marginTop: 20,
+                marginBottom: 10,
+                fontSize: 16,
+                fontFamily: "Roboto",
+                paddingBottom: 15,
+              }}
+            >
+              {userInfo.description}
+            </Text>
             <View style={styles.interest}>
               <Text
                 style={{
@@ -584,9 +619,10 @@ const ProfileScreen = ({ navigation }) => {
                   fontWeight: "bold",
                   textDecorationLine: "underline",
                   marginBottom: 20,
+                  fontFamily: "ManropeBold",
                 }}
               >
-                Intérêts & Sports
+                Sports & activities
               </Text>
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
                 {userFavActivitiesProfile}
@@ -615,8 +651,9 @@ const ProfileScreen = ({ navigation }) => {
                   fontSize: 16,
                   fontWeight: "bold",
                   textDecorationLine: "underline",
-                  marginTop: 10,
+                  marginTop: 20,
                   marginBottom: 20,
+                  fontFamily: "ManropeBold",
                 }}
               >
                 Ce que les autres pensent
@@ -626,7 +663,10 @@ const ProfileScreen = ({ navigation }) => {
                   fontStyle: "italic",
                   textAlign: "center",
                   color: "grey",
-                  marginBottom: 20,
+                  marginBottom: 25,
+                  fontFamily: "Roboto",
+                  fontSize: 15,
+                  paddingHorizontal: 35,
                 }}
               >
                 Engage in new events to get reviews from other members !
@@ -647,7 +687,7 @@ const ProfileScreen = ({ navigation }) => {
                     <Text>8</Text>
                   </View>
                 </View>
-                <View style={{ flexDirection: "row" }}>
+                <View style={styles.reviewBox}>
                   <View style={styles.reviewText}>
                     <Text>Bienveillant</Text>
                   </View>
@@ -681,6 +721,18 @@ const ProfileScreen = ({ navigation }) => {
                 </View>
               </View>
             </View>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 50,
+            }}
+          >
+            <TouchableOpacity style={styles.logOutBtn}>
+              <Text style={{ fontWeight: "700", color: "white" }}>Log out</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
@@ -733,13 +785,22 @@ const styles = StyleSheet.create({
   interest: {
     width: "100%",
   },
-  rounded: {
+  roundedS: {
     backgroundColor: "#9660DA",
     borderRadius: 50,
-    paddingTop: 4,
-    paddingBottom: 4,
-    paddingRight: 14,
-    paddingLeft: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  roundedA: {
+    backgroundColor: "#E46986",
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  roundedText: {
+    color: "#fff",
+    fontFamily: "Roboto",
+    fontSize: 15,
   },
   pref: {
     width: "100%",
@@ -749,21 +810,21 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 22,
   },
+  reviewBox: {
+    flexDirection: "row",
+  },
   reviewText: {
-    backgroundColor: "#C8C8C8",
-    paddingTop: 4,
-    paddingBottom: 4,
-    paddingRight: 14,
-    paddingLeft: 14,
+    backgroundColor: "#F4F4F4",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
     borderTopLeftRadius: 25,
     borderBottomLeftRadius: 25,
+    fontFamily: "Roboto",
   },
   reviewCount: {
     backgroundColor: "#BD9BE4",
-    paddingTop: 4,
-    paddingBottom: 4,
-    paddingRight: 14,
-    paddingLeft: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderTopRightRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -797,5 +858,15 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 5,
     height: 45,
+  },
+  logOutBtn: {
+    backgroundColor: "#EE6262",
+    borderRadius: 15,
+    height: 35,
+    width: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 25,
+    opacity: 0.5,
   },
 });

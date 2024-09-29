@@ -754,7 +754,8 @@ const EventsScreen = ({ navigation }) => {
                         {event.name}
                       </Text>
                       <Text style={{ fontFamily: "Lato" }}>
-                        ({displayDate(new Date(event.date))})
+                        ({moment(event.date).format("ddd, DD. MMM YYYY")}
+                        {displayDate(new Date(event.date))})
                       </Text>
                       <Text style={{ fontFamily: "Lato" }}>
                         Time: {event.startTime}-{event.endTime}

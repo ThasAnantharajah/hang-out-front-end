@@ -20,6 +20,8 @@ import {
 } from "react-native-calendars";
 
 import moment from "moment";
+moment.locale("en");
+
 import "moment-timezone";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -556,6 +558,7 @@ const CalendarScreen = ({ navigation }) => {
                       width: "100%",
                       marginVertical: 8,
                       opacity: 0.5,
+                      marginBottom: 60,
                     }}
                   >
                     <View>
@@ -598,10 +601,11 @@ const CalendarScreen = ({ navigation }) => {
                   <Text
                     style={{
                       color: "gray",
-                      fontSize: 16,
+                      fontSize: 15,
                       textAlign: "center",
                       fontStyle: "italic",
                       margin: 20,
+                      marginBottom: 60,
                     }}
                   >
                     No passed events on this day..

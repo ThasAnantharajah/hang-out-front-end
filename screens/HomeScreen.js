@@ -92,7 +92,7 @@ const HomeScreen = ({ navigation }) => {
         >
           Here are some suggestions for you
         </Text>
-        <View style={{ paddingTop: 20 }}>
+        <View style={{ paddingTop: 20, marginBottom: 20 }}>
           <Text style={{ fontSize: 20, fontWeight: "600", color: "#4B3196" }}>
             Events happening {""}
             <Text style={{ fontSize: 20, fontWeight: "600", color: "#9660DA" }}>
@@ -138,7 +138,19 @@ const HomeScreen = ({ navigation }) => {
             </View>
           ))
         ) : (
-          <Text> No events happening today.</Text>
+          <Text
+            style={{
+              color: "gray",
+              fontSize: 15,
+              textAlign: "center",
+              fontStyle: "italic",
+              margin: 20,
+              marginBottom: 20,
+            }}
+          >
+            {" "}
+            No events happening today.
+          </Text>
         )}
 
         <View style={{ paddingTop: 20 }}>

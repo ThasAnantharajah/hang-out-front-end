@@ -35,7 +35,7 @@ import {
   SelectList,
   MultipleSelectList,
 } from "react-native-dropdown-select-list";
-import moment from 'moment';
+import moment from "moment";
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -72,7 +72,7 @@ const ProfileCreationScreen = ({ navigation }) => {
   ];
 
   const dispatch = useDispatch();
-// CONFLICT KEPT IN CASE
+  // CONFLICT KEPT IN CASE
   // let cameraRef = useRef(null);
 
   // const handleImgPicker = async () => {
@@ -132,59 +132,58 @@ const ProfileCreationScreen = ({ navigation }) => {
 
   useEffect(() => {
     (async () => {
-      console.log("LOAD Username stored in redux:", usernameLogged);
-      console.log(
-        "LOAD User infos stored in redux:",
-        "USERNAME:",
-        userInfos.username,
-        "GENDER:",
-        userInfos.gender,
-        "SPORTS:",
-        userInfos.sports,
-        "ACTIVITIES:",
-        userInfos.activities,
-        "EMAIL:",
-        userInfos.email
-      );
-
       const result = await Camera.requestCameraPermissionsAsync();
       if (result) {
         setHasPermission(result.status === "granted");
       }
-
-      fetch("https://hang-out-back-end.vercel.app/activities")
-        .then((res) => res.json())
-        .then((data) => {
-          let activityArray = data.activities.map((activity, i) => ({
-            key: i,
-            value: activity.name,
-          }));
-         
-          setActivitiesList(activityArray);
-
-          fetch("https://hang-out-back-end.vercel.app/sports")
-            .then((res) => res.json())
-            .then((data) => {
-              let sportArray = data.sports.map((sport, i) => ({
-                key: i,
-                value: sport.name,
-              }));
-              // console.log("SportArray:", sportArray);
-              setSportsList(sportArray);
-            });
-        });
     })();
+
+    console.log("LOAD Username stored in redux:", usernameLogged);
+    // console.log(
+    //   "LOAD User infos stored in redux:",
+    //   "USERNAME:",
+    //   userInfos.username,
+    //   "GENDER:",
+    //   userInfos.gender,
+    //   "SPORTS:",
+    //   userInfos.sports,
+    //   "ACTIVITIES:",
+    //   userInfos.activities,
+    //   "EMAIL:",
+    //   userInfos.email
+    // );
+
+    fetch("https://hang-out-back-end.vercel.app/activities")
+      .then((res) => res.json())
+      .then((data) => {
+        let activityArray = data.activities.map((activity, i) => ({
+          key: i,
+          value: activity.name,
+        }));
+
+        setActivitiesList(activityArray);
+
+        fetch("https://hang-out-back-end.vercel.app/sports")
+          .then((res) => res.json())
+          .then((data) => {
+            let sportArray = data.sports.map((sport, i) => ({
+              key: i,
+              value: sport.name,
+            }));
+            // console.log("SportArray:", sportArray);
+            setSportsList(sportArray);
+          });
+      });
   }, []);
 
+  let cameraRef = useRef(null);
 
-let cameraRef = useRef(null);
-
-const handleCamera = () => {
+  const handleCamera = () => {
     setShowCamera(!showCamera);
     setShowModal(true);
-};
+  };
 
-const takePicture = async () => {
+  const takePicture = async () => {
     const photo = await cameraRef.takePictureAsync({ quality: 0.3 });
 
     if (photo) {
@@ -192,7 +191,7 @@ const takePicture = async () => {
     }
   };
 
-const handleImgPicker = async () => {
+  const handleImgPicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -206,7 +205,7 @@ const handleImgPicker = async () => {
     }
   };
 
-const uploadPicture = (uri, type) => {
+  const uploadPicture = (uri, type) => {
     const formData = new FormData();
     formData.append("photoFromFront", {
       uri,
@@ -220,30 +219,25 @@ const uploadPicture = (uri, type) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.url)
+        console.log(data.url);
         if (data.result) {
-          
           setImage(data.url);
           setProfilePic(data.url);
         }
       });
   };
 
-const handleDate = (input) => {
-    let slashedDate; 
+  const handleDate = (input) => {
+    let slashedDate;
     if (input.length === 8) {
       slashedDate = `${input.slice(0, 2)}/${input.slice(2, 4)}/${input.slice(
         -4
       )}`;
     }
-    
 
-    const dateForBack = moment(slashedDate, "DD/MM/YYYY").toDate()
-     console.log(dateForBack)
+    const dateForBack = moment(slashedDate, "DD/MM/YYYY").toDate();
     setBirthdate(dateForBack);
-    
-};
-
+  };
 
   // UPDATE USER FUNCTION WITH PUT METHOD
   const userInfos = useSelector((state) => state.user.user);
@@ -255,8 +249,8 @@ const handleDate = (input) => {
       birthdate: birthdate,
       gender: gender,
       description: description,
-      activities: favoriteActivities,
-      sports: favoriteSports,
+      favoriteActivities: favoriteActivities,
+      favoriteSports: favoriteSports,
       city: city,
       profilePic: profilePic,
     };
@@ -269,14 +263,15 @@ const handleDate = (input) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateUser),
       }
-    ).then((response) => {
-      return response.json().then((data) => ({
-        status: response.status,
-        data,
-      }));
-    });
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Results:", data);
+      })
+      .catch((error) => {
+        console.error("Error updating user:", error);
+      });
 
-    
     dispatch(nameUpdate(name));
     dispatch(genderUpdate(gender));
     dispatch(ageUpdate(birthdate));
@@ -390,7 +385,7 @@ const handleDate = (input) => {
             <View style={{ width: "100%", height: "35%" }}>
               <Image style={styles.camera} source={{ uri: image }}></Image>
             </View>
-            {/**************************************************************************CAMERA************************************************************************/}
+            {/***************************************************CAMERA********************************************************/}
             <View
               style={{
                 flexDirection: "row",

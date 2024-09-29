@@ -7,18 +7,16 @@ const initialState = {
     email: "",
     name: "",
     gender: "",
-    sports: [],
-    activities: [],
+    favoriteSports: [],
+    favoriteActivities: [],
     age: "",
     city: "",
     desc: "",
     photo: "",
-    chatScreenName:"",
+    chatScreenName: "",
     userprofilePic,
     receiverPhoto,
-    
   },
-   
 };
 
 export const userSlice = createSlice({
@@ -49,10 +47,10 @@ export const userSlice = createSlice({
       state.user.gender = action.payload;
     },
     sportsUpdate: (state, action) => {
-      state.user.sports = [action.payload];
+      state.user.favoriteSports = [action.payload];
     },
     activitiesUpdate: (state, action) => {
-      state.user.activities = [action.payload];
+      state.user.favoriteActivities = [action.payload];
     },
     photoUpdate: (state, action) => {
       state.user.photo = action.payload;
@@ -72,12 +70,9 @@ export const userSlice = createSlice({
     userprofilePic: (state, action) => {
       state.user.userprofilePic = action.payload;
     },
-    receiverPhoto: (state,action) => {
-      state.user.receiverPhoto = action.payload
-    }
-
-   
-
+    receiverPhoto: (state, action) => {
+      state.user.receiverPhoto = action.payload;
+    },
   },
 });
 
@@ -98,7 +93,6 @@ export const {
   friendsIdUpdate,
   chatName,
   userprofilePic,
-  receiverPhoto
-
+  receiverPhoto,
 } = userSlice.actions;
 export default userSlice.reducer;
