@@ -26,6 +26,10 @@ import "moment-timezone";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
+import { retrieveImage } from "../assets/src/mappingPic";
+
+import { useIsFocused } from "@react-navigation/native";
+
 import { useEffect } from "react";
 
 const CalendarScreen = ({ navigation }) => {
@@ -47,7 +51,79 @@ const CalendarScreen = ({ navigation }) => {
   const [showModal, setShowModal] = useState(false);
   const [showRegisteredModal, setShowRegisteredModal] = useState(false);
 
+  const [registeredUsers, setRegisteredUsers] = useState();
+  const [isRegistered, setIsRegistered] = useState(false);
+
+  const userInfos = useSelector((state) => state.user.user);
+
   const usernameLogged = useSelector((state) => state.user.user.username);
+
+  // const isFocused = useIsFocused();
+
+  const loadRegistered = () => {
+    console.log("EVENTID", eventID);
+    fetch(
+      `https://hang-out-back-end.vercel.app/events/${eventID}/registered-users`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Registered users:", data);
+        setRegisteredUsers(data.registeredUsers);
+
+        checkRegistrationStatus(data.registeredUsers);
+      });
+  };
+
+  const checkRegistrationStatus = (registeredUsers) => {
+    const registeredUserIds = registeredUsers.map((user) => user.userId);
+    setIsRegistered(registeredUserIds.includes(userInfos.userId));
+  };
+
+  const displayRegistered = () => {
+    return registeredUsers && registeredUsers.length > 0 ? (
+      registeredUsers.map((user, i) => {
+        console.log("REG USER", user);
+        console.log("Profile Pic URL:", user.profilePic);
+        const defaultImage = require("../assets/blank-profile.png");
+
+        return (
+          <View
+            key={i}
+            style={{
+              padding: 10,
+              marginVertical: 5,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              style={styles.imgReg}
+              source={
+                user.profilePic && user.profilePic !== "No Profile Pic"
+                  ? { uri: user.profilePic }
+                  : defaultImage
+              }
+              resizeMode="center"
+            />
+            <View style={styles.regText}>
+              <Text style={styles.regTextName}>{user.name}</Text>
+              <Text style={styles.regTextInfos}>
+                {user.city} ,
+                {user.gender === "Don't want to say"
+                  ? "Ø"
+                  : ` ${user.gender.charAt(0)}.`}
+              </Text>
+            </View>
+          </View>
+        );
+      })
+    ) : (
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <Text>No registered users yet.</Text>
+        <Text>Join the event now!</Text>
+      </View>
+    );
+  };
 
   const previewEvent = (id) => {
     fetch(`https://hang-out-back-end.vercel.app/events/search/${id}`)
@@ -62,9 +138,9 @@ const CalendarScreen = ({ navigation }) => {
       });
   };
 
-  const registerUser = (username, eventID) => {
+  const registerUser = (userId, eventID) => {
     fetch(
-      `https://hang-out-back-end.vercel.app/events/register/${eventID}/${username}`,
+      `https://hang-out-back-end.vercel.app/events/register/${eventID}/${userId}`,
       {
         method: "PUT",
         headers: {
@@ -74,7 +150,45 @@ const CalendarScreen = ({ navigation }) => {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log("User registered.");
+        if (data.result) {
+          alert("You are now registered.");
+          console.log("User registered.");
+        } else {
+          if (data.message === "No available slots.") {
+            alert("Event is full. Registration failed");
+          } else if (data.message === "User is already registered.") {
+            alert("You are already registered.");
+          } else if (
+            data.message === "Registration not allowed: Event is female-only."
+          ) {
+            alert("This event is for women only.");
+          } else {
+            alert("Registration failed: " + data.message);
+          }
+        }
+      });
+  };
+
+  const unregisterUser = (userId, eventID) => {
+    fetch(
+      `https://hang-out-back-end.vercel.app/events/unregister/${eventID}/${userId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          alert("You've been unregistered from this event.");
+          loadRegistered();
+        } else if (data.message === "User is not registered yet.") {
+          alert("You are not registered yet.");
+        } else {
+          alert(data.message);
+        }
       });
   };
 
@@ -121,6 +235,7 @@ const CalendarScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
+    // if (isFocused) {
     console.log("Updated EVENTS ON DATE:", eventsOnDate);
 
     //FOR MARKED DATES
@@ -138,6 +253,9 @@ const CalendarScreen = ({ navigation }) => {
         setEventDates(result);
         console.log("EVENTDATES:", result);
       });
+
+    // retrieveDayEvents(new Date().dateString);
+    // }
   }, [eventsOnDate]);
 
   return (
@@ -145,17 +263,21 @@ const CalendarScreen = ({ navigation }) => {
       <Modal transparent={true} visible={showModal} animationType="slide">
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <Image
-              style={{
-                height: "30%",
-                width: "100%",
-                borderTopRightRadius: 10,
-                borderTopLeftRadius: 10,
-              }}
-              source={require("../assets/sports/Badminton-min.jpg")} // image associöe ä l'event
-            ></Image>
+            {singleEventData && singleEventData.event ? (
+              <Image
+                style={{
+                  height: "30%",
+                  width: "100%",
+                  borderTopRightRadius: 10,
+                  borderTopLeftRadius: 10,
+                }}
+                source={retrieveImage[singleEventData.event]}
+              />
+            ) : (
+              <Text>Loading image...</Text>
+            )}
             <View style={{ padding: 20, height: "70%" }}>
-              {singleEventData ? ( // Check if `singleEventData` has data
+              {singleEventData ? (
                 <>
                   <Text style={styles.modalTitle}>{singleEventData.name}</Text>
                   <ScrollView>
@@ -169,10 +291,12 @@ const CalendarScreen = ({ navigation }) => {
                       <View style={styles.infoCont}>
                         <FontAwesome
                           name="map-pin"
-                          size={25}
+                          size={20}
                           color="#E46986"
                           style={{ paddingRight: 5 }}
                         />
+
+                        {/* <Text style={styles.info}>City:</Text> */}
                         <Text style={styles.filled}>
                           {singleEventData.place.city}
                         </Text>
@@ -224,9 +348,10 @@ const CalendarScreen = ({ navigation }) => {
                     </View>
                     <View style={{ flexDirection: "column" }}>
                       <TouchableOpacity
-                        style={styles.regButton}
+                        style={styles.showRegButton}
                         onPress={() => {
                           setShowRegisteredModal(true);
+                          loadRegistered();
                           console.log("Modal should open now");
                           console.log(showRegisteredModal);
                         }}
@@ -252,7 +377,7 @@ const CalendarScreen = ({ navigation }) => {
                       <TouchableOpacity
                         style={styles.regButton}
                         onPress={() =>
-                          registerUser(usernameLogged, eventID) &&
+                          registerUser(userInfos.userId, eventID) &&
                           alert("You've been registered to this event.")
                         }
                       >
@@ -269,7 +394,7 @@ const CalendarScreen = ({ navigation }) => {
                       flexDirection: "row",
                       justifyContent: "space-between",
                       gap: 20,
-                      marginTop: 20, // Add some margin for spacing
+                      marginTop: 20,
                     }}
                   >
                     <TouchableOpacity
@@ -294,7 +419,12 @@ const CalendarScreen = ({ navigation }) => {
           <View style={styles.modalRegBck}>
             <View style={styles.modalReg}>
               <Text
-                style={{ fontWeight: "700", fontSize: 20, marginBottom: 20 }}
+                style={{
+                  fontWeight: "700",
+                  fontSize: 20,
+                  marginBottom: 20,
+                  color: "#4B3196",
+                }}
               >
                 Participants
               </Text>
@@ -306,38 +436,26 @@ const CalendarScreen = ({ navigation }) => {
                   gap: 10,
                 }}
               >
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/face.jpg")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/blank-profile.png")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/blank-profile.png")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/face.jpg")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/blank-profile.png")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/blank-profile.png")}
-                ></Image>
+                {displayRegistered(eventID)}
               </View>
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row", gap: 20 }}>
                 <TouchableOpacity
                   style={styles.closeButton}
                   onPress={() => setShowRegisteredModal(false)}
                 >
                   <Text style={styles.closeText}>Close</Text>
                 </TouchableOpacity>
+                {isRegistered && (
+                  <TouchableOpacity
+                    style={styles.regButton}
+                    onPress={() => {
+                      unregisterUser(userInfos.userId, eventID);
+                      setShowRegisteredModal(false);
+                    }}
+                  >
+                    <Text style={styles.closeText}>Unregister</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           </View>
@@ -396,10 +514,11 @@ const CalendarScreen = ({ navigation }) => {
               arrowColor: "#9660DA",
               disabledArrowColor: "#d9e1e8",
               monthTextColor: "#9660DA",
+              textMonthFontFamily: "Manrope",
               indicatorColor: "blue",
               textDayFontFamily: "monospace",
-              textMonthFontFamily: "monospace",
-              textDayHeaderFontFamily: "monospace",
+              textMonthFontFamily: "Manrope",
+              textDayHeaderFontFamily: "Manrope",
               textDayFontWeight: "300",
               textMonthFontWeight: "bold",
               textDayHeaderFontWeight: "300",
@@ -410,7 +529,7 @@ const CalendarScreen = ({ navigation }) => {
             }}
             style={{
               paddingBottom: 15,
-              fontFamily: "Roboto",
+              fontFamily: "Manrope",
             }}
             onDayPress={(day) => {
               console.log("selected day", day);
@@ -483,7 +602,7 @@ const CalendarScreen = ({ navigation }) => {
                     <View>
                       <Image
                         style={styles.img}
-                        source={require("../assets/activities/Camping-min.jpg")}
+                        source={retrieveImage[event.event]}
                       />
                     </View>
                     <View style={styles.card}>
@@ -510,7 +629,15 @@ const CalendarScreen = ({ navigation }) => {
                           console.log("Modal should open now");
                         }}
                       >
-                        <Text>VOIR</Text>
+                        <Text
+                          style={{
+                            fontFamily: "LatoBold",
+                            color: "#fff",
+                            fontWeight: "700",
+                          }}
+                        >
+                          VOIR
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -522,9 +649,8 @@ const CalendarScreen = ({ navigation }) => {
                       color: "gray",
                       fontSize: 16,
                       textAlign: "center",
-                      fontStyle: "italic",
+                      fontFamily: "LatoItalic",
                       margin: 20,
-                      fontFamily: "Roboto",
                     }}
                   >
                     No upcoming events on this day.
@@ -558,13 +684,13 @@ const CalendarScreen = ({ navigation }) => {
                       width: "100%",
                       marginVertical: 8,
                       opacity: 0.5,
-                      marginBottom: 60,
+                      marginBottom: 20,
                     }}
                   >
                     <View>
                       <Image
                         style={styles.img}
-                        source={require("../assets/activities/Bowling-min.jpg")}
+                        source={retrieveImage[event.event]}
                       />
                     </View>
                     <View style={styles.card}>
@@ -591,7 +717,15 @@ const CalendarScreen = ({ navigation }) => {
                           console.log("Modal should open now");
                         }}
                       >
-                        <Text>VOIR</Text>
+                        <Text
+                          style={{
+                            fontFamily: "LatoBold",
+                            color: "#fff",
+                            fontWeight: "700",
+                          }}
+                        >
+                          VOIR
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -601,14 +735,14 @@ const CalendarScreen = ({ navigation }) => {
                   <Text
                     style={{
                       color: "gray",
-                      fontSize: 15,
+                      fontSize: 16,
+                      fontFamily: "LatoItalic",
                       textAlign: "center",
-                      fontStyle: "italic",
                       margin: 20,
                       marginBottom: 60,
                     }}
                   >
-                    No passed events on this day..
+                    No passed events on this day.
                   </Text>
                 </View>
               )}
@@ -660,23 +794,39 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   img: {
+    width: 100,
     height: 90,
-    width: 80,
     borderTopLeftRadius: 25,
     borderBottomLeftRadius: 25,
+    shadowColor: "#D8D8D8",
+    shadowOffset: { width: -1, height: 5 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+
+    shadowColor: "#D8D8D8",
+    shadowOffset: { width: -1, height: 5 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
   },
   card: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#D8D8D8",
-    paddingTop: 4,
-    paddingBottom: 4,
+    backgroundColor: "#f1f1f1",
+    paddingTop: 2,
+    paddingBottom: 2,
     paddingRight: 14,
     paddingLeft: 14,
     borderTopRightRadius: 25,
     borderBottomRightRadius: 25,
+    paddingVertical: 10,
+    height: 90,
+
+    shadowColor: "#D8D8D8",
+    shadowOffset: { width: -1, height: 5 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
   },
   btn: {
     backgroundColor: "#E46986",
@@ -693,12 +843,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 
   modalContainer: {
     width: "85%",
-    height: "70%",
+    height: "80%",
     padding: 0,
     backgroundColor: "white",
     borderRadius: 10,
@@ -761,7 +911,116 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  info: {
+    fontSize: 15,
+    fontWeight: "700",
+    marginRight: 4,
+  },
+  infoCont: {
+    flexDirection: "row",
+    marginVertical: 5,
+  },
+  filled: {
+    fontSize: 15,
+  },
+  closeText: {
+    fontWeight: "700",
+    color: "#fff",
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  closeButton: {
+    flex: 1,
+    marginTop: 15,
+    backgroundColor: "grey",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    height: 45,
+    justifyContent: "center",
+  },
+  closeButtonMap: {
+    width: "55%",
+    marginTop: 25,
+    backgroundColor: "grey",
+    borderRadius: 8,
+    alignItems: "center",
+    height: 40,
+    justifyContent: "center",
+  },
+  showRegButton: {
+    flex: 1,
+    marginTop: 15,
+    backgroundColor: "#B090D9",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    height: 45,
+    justifyContent: "center",
+  },
+  regButton: {
+    flex: 1,
+    marginTop: 15,
+    backgroundColor: "#E46986",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    height: 45,
+    justifyContent: "center",
+  },
+  imgReg: {
+    height: 40,
+    width: 40,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: "#8F5CD1",
+    overflow: "hidden",
+  },
+  imageContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 50,
+    width: 50,
+  },
+  regText: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  regTextName: {
+    fontWeight: "700",
+    fontFamily: "MPO",
+  },
+  regTextInfos: {
+    fontFamily: "Lato",
+  },
+  modalReg: {
+    width: "85%",
+    height: "75%",
+    padding: 30,
+    // justifyContent: "space-between",
+    backgroundColor: "white",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+
+  modalRegBck: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   info: {
     fontSize: 15,

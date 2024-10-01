@@ -47,7 +47,7 @@ export const userSlice = createSlice({
       state.user.gender = action.payload;
     },
     sportsUpdate: (state, action) => {
-      state.user.favoriteSports = [action.payload];
+      state.user.favoriteSpor = [action.payload];
     },
     activitiesUpdate: (state, action) => {
       state.user.favoriteActivities = [action.payload];

@@ -32,21 +32,18 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import signup from "./reducers/signup";
 import user from "./reducers/user";
 import message from "./reducers/message";
-import { nbrOfMessage} from "./reducers/message";
-
+import { nbrOfMessage } from "./reducers/message";
 
 const reducers = combineReducers({ signup, user, message });
 const persistConfig = { key: "hangoutStorage", storage: AsyncStorage };
 import { beginAsyncEvent } from "react-native/Libraries/Performance/Systrace";
 
-
-
 // const [number, setNumber] = useState('')
 
-  // useEffect(() => {
-  //    const nbrMessage = useSelector((state) => state.message.message.nbrOfMessage);
-  //    setNumber(nbrMessage)
-  // }, [nbrOfMessage]);
+// useEffect(() => {
+//    const nbrMessage = useSelector((state) => state.message.message.nbrOfMessage);
+//    setNumber(nbrMessage)
+// }, [nbrOfMessage]);
 
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
@@ -69,14 +66,16 @@ const fetchFonts = () => {
     ManropeBold: require("./assets/fonts/ManropeBold.ttf"),
 
     Lato: require("./assets/fonts/LatoRegular.ttf"),
+    LatoBold: require("./assets/fonts/LatoBold.ttf"),
+    LatoItalic: require("./assets/fonts/LatoItalic.ttf"),
+
+    MPO: require("./assets/fonts/MPORegular.ttf"),
   });
 };
 
 const TabNavigator = () => {
-
-
-const nbr = useSelector((state) => state.message.nbrOfMessage);
-console.log('reducer',nbr);
+  const nbr = useSelector((state) => state.message.nbrOfMessage);
+  console.log("reducer", nbr);
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
@@ -156,7 +155,6 @@ console.log('reducer',nbr);
                   paddingTop: 2,
                 }}
               />
-           
             </View>
           );
         },
@@ -233,10 +231,8 @@ console.log('reducer',nbr);
 
 export default function App() {
   return (
-    
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-        
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={LoginScreen} />

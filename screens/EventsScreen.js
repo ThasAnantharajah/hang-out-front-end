@@ -24,6 +24,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 
 import moment from "moment";
+moment.locale("en");
+
+import { retrieveImage } from "../assets/src/mappingPic";
 
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -36,7 +39,6 @@ const EventsScreen = ({ navigation }) => {
   const [startInput, setStartInput] = useState("");
   const [endInput, setEndInput] = useState("");
 
-  const registeredUsers = 2;
   // data treated
   const [eventData, setEventData] = useState();
   const [modalEvent, setModalEvent] = useState();
@@ -55,6 +57,9 @@ const EventsScreen = ({ navigation }) => {
 
   const usernameLogged = useSelector((state) => state.user.user.username);
   const userInfos = useSelector((state) => state.user.user);
+
+  const [registeredUsers, setRegisteredUsers] = useState();
+  const [isRegistered, setIsRegistered] = useState(false);
 
   useEffect(() => {
     //ASK FOR LOC PERMISSION
@@ -130,6 +135,71 @@ const EventsScreen = ({ navigation }) => {
       : null;
   };
 
+  const loadRegistered = () => {
+    console.log("EVENTID", eventID);
+    fetch(
+      `https://hang-out-back-end.vercel.app/events/${eventID}/registered-users`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Registered users:", data);
+        setRegisteredUsers(data.registeredUsers);
+
+        checkRegistrationStatus(data.registeredUsers);
+      });
+  };
+
+  const checkRegistrationStatus = (registeredUsers) => {
+    const registeredUserIds = registeredUsers.map((user) => user.userId);
+    setIsRegistered(registeredUserIds.includes(userInfos.userId));
+  };
+
+  const displayRegistered = () => {
+    return registeredUsers && registeredUsers.length > 0 ? (
+      registeredUsers.map((user, i) => {
+        console.log("REG USER", user);
+        console.log("Profile Pic URL:", user.profilePic);
+        const defaultImage = require("../assets/blank-profile.png");
+
+        return (
+          <View
+            key={i}
+            style={{
+              padding: 10,
+              marginVertical: 5,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              style={styles.imgReg}
+              source={
+                user.profilePic && user.profilePic !== "No Profile Pic"
+                  ? { uri: user.profilePic }
+                  : defaultImage
+              }
+              resizeMode="center"
+            />
+            <View style={styles.regText}>
+              <Text style={styles.regTextName}>{user.name}</Text>
+              <Text style={styles.regTextInfos}>
+                {user.city} ,
+                {user.gender === "Don't want to say"
+                  ? "Ø"
+                  : ` ${user.gender.charAt(0)}.`}
+              </Text>
+            </View>
+          </View>
+        );
+      })
+    ) : (
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <Text>No registered users yet.</Text>
+        <Text>Join the event now!</Text>
+      </View>
+    );
+  };
+
   const handleSearch = () => {
     const queryParams = new URLSearchParams();
 
@@ -173,9 +243,9 @@ const EventsScreen = ({ navigation }) => {
       });
   };
 
-  const registerUser = (username, eventID) => {
+  const registerUser = (userId, eventID) => {
     fetch(
-      `https://hang-out-back-end.vercel.app/events/register/${eventID}/${username}`,
+      `https://hang-out-back-end.vercel.app/events/register/${eventID}/${userId}`,
       {
         method: "PUT",
         headers: {
@@ -185,7 +255,45 @@ const EventsScreen = ({ navigation }) => {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log("User registered.");
+        if (data.result) {
+          alert("You are now registered.");
+          console.log("User registered.");
+        } else {
+          if (data.message === "No available slots.") {
+            alert("Event is full. Registration failed");
+          } else if (data.message === "User is already registered.") {
+            alert("You are already registered.");
+          } else if (
+            data.message === "Registration not allowed: Event is female-only."
+          ) {
+            alert("This event is for women only.");
+          } else {
+            alert("Registration failed: " + data.message);
+          }
+        }
+      });
+  };
+
+  const unregisterUser = (userId, eventID) => {
+    fetch(
+      `https://hang-out-back-end.vercel.app/events/unregister/${eventID}/${userId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          alert("You've been unregistered from this event.");
+          loadRegistered();
+        } else if (data.message === "User is not registered yet.") {
+          alert("You are not registered yet.");
+        } else {
+          alert(data.message);
+        }
       });
   };
 
@@ -196,15 +304,19 @@ const EventsScreen = ({ navigation }) => {
       <Modal transparent={true} visible={showModal} animationType="slide">
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <Image
-              style={{
-                height: "30%",
-                width: "100%",
-                borderTopRightRadius: 10,
-                borderTopLeftRadius: 10,
-              }}
-              source={require("../assets/sports/Badminton-min.jpg")}
-            ></Image>
+            {singleEventData && singleEventData.event ? (
+              <Image
+                style={{
+                  height: "30%",
+                  width: "100%",
+                  borderTopRightRadius: 10,
+                  borderTopLeftRadius: 10,
+                }}
+                source={retrieveImage[singleEventData.event]}
+              />
+            ) : (
+              <Text>Loading image...</Text>
+            )}
             <View style={{ padding: 20, height: "70%" }}>
               {singleEventData ? (
                 <>
@@ -277,9 +389,10 @@ const EventsScreen = ({ navigation }) => {
                     </View>
                     <View style={{ flexDirection: "column" }}>
                       <TouchableOpacity
-                        style={styles.regButton}
+                        style={styles.showRegButton}
                         onPress={() => {
                           setShowRegisteredModal(true);
+                          loadRegistered();
                           console.log("Modal should open now");
                           console.log(showRegisteredModal);
                         }}
@@ -305,7 +418,7 @@ const EventsScreen = ({ navigation }) => {
                       <TouchableOpacity
                         style={styles.regButton}
                         onPress={() =>
-                          registerUser(usernameLogged, eventID) &&
+                          registerUser(userInfos.userId, eventID) &&
                           alert("You've been registered to this event.")
                         }
                       >
@@ -364,38 +477,26 @@ const EventsScreen = ({ navigation }) => {
                   gap: 10,
                 }}
               >
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/face.jpg")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/blank-profile.png")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/blank-profile.png")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/face.jpg")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/blank-profile.png")}
-                ></Image>
-                <Image
-                  style={styles.imgReg}
-                  source={require("../assets/blank-profile.png")}
-                ></Image>
+                {displayRegistered(eventID)}
               </View>
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row", gap: 20 }}>
                 <TouchableOpacity
                   style={styles.closeButton}
                   onPress={() => setShowRegisteredModal(false)}
                 >
                   <Text style={styles.closeText}>Close</Text>
                 </TouchableOpacity>
+                {isRegistered && (
+                  <TouchableOpacity
+                    style={styles.regButton}
+                    onPress={() => {
+                      unregisterUser(userInfos.userId, eventID);
+                      setShowRegisteredModal(false);
+                    }}
+                  >
+                    <Text style={styles.closeText}>Unregister</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           </View>
@@ -428,7 +529,7 @@ const EventsScreen = ({ navigation }) => {
                   fontSize: 25,
                   fontWeight: "bold",
                   color: "#4B3196",
-                  fontFamily: "ManropeBold",
+                  fontFamily: "MPO",
                 }}
               >
                 Map View
@@ -447,8 +548,9 @@ const EventsScreen = ({ navigation }) => {
                 latitude: defaultLat,
                 longitude: defaultLong,
 
-                latitudeDelta: 5, // Zoom level: smaller means more zoom
-                longitudeDelta: 5, // Zoom level: smaller means more zoom
+                latitudeDelta: 5,
+
+                longitudeDelta: 5,
               }}
               style={{
                 justifyContent: "center",
@@ -461,8 +563,8 @@ const EventsScreen = ({ navigation }) => {
                 center={{ latitude: defaultLat, longitude: defaultLong }}
                 radius={20000} // Radius in meters
                 strokeWidth={3}
-                strokeColor={"rgba(0,112,255,0.5)"}
-                fillColor={"rgba(0,112,255,0.1)"}
+                strokeColor={"rgba(75,49,150,0.6)"}
+                fillColor={"rgba(214,117,255,0.2)"}
               />
 
               {loadMarkers()}
@@ -671,7 +773,9 @@ const EventsScreen = ({ navigation }) => {
               backgroundColor: "#9660DA",
               borderRadius: 8,
               padding: 10,
-              paddingHorizontal: 20,
+              paddingHorizontal: 40,
+              height: 45,
+              justifyContent: "center",
               alignItems: "center",
             }}
             onPress={() => handleSearch()}
@@ -679,7 +783,7 @@ const EventsScreen = ({ navigation }) => {
             <Text
               style={{
                 color: "white",
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: "600",
                 fontFamily: "Lato",
               }}
@@ -738,7 +842,7 @@ const EventsScreen = ({ navigation }) => {
                   <View>
                     <Image
                       style={styles.img}
-                      source={require("../assets/activities/Bowling-min.jpg")}
+                      source={retrieveImage[event.event]}
                     />
                   </View>
                   <View style={styles.card}>
@@ -754,8 +858,7 @@ const EventsScreen = ({ navigation }) => {
                         {event.name}
                       </Text>
                       <Text style={{ fontFamily: "Lato" }}>
-                        ({moment(event.date).format("ddd, DD. MMM YYYY")}
-                        {displayDate(new Date(event.date))})
+                        {moment(event.date).format("ddd, DD MMM YYYY")}
                       </Text>
                       <Text style={{ fontFamily: "Lato" }}>
                         Time: {event.startTime}-{event.endTime}
@@ -773,9 +876,18 @@ const EventsScreen = ({ navigation }) => {
                         setShowModal(true);
 
                         console.log("Modal should open now");
+                        console.log("event id unique:", eventID);
                       }}
                     >
-                      <Text style={{ fontFamily: "Lato" }}>VOIR</Text>
+                      <Text
+                        style={{
+                          fontFamily: "LatoBold",
+                          color: "#fff",
+                          fontWeight: "700",
+                        }}
+                      >
+                        VOIR
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -913,28 +1025,35 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   img: {
+    width: 100,
     height: 90,
-    width: 90,
     borderTopLeftRadius: 25,
     borderBottomLeftRadius: 25,
-
     shadowColor: "#D8D8D8",
-    shadowOffset: { width: -1, height: 3 },
-    shadowOpacity: 0.6,
-    shadowRadius: 2,
+    shadowOffset: { width: -1, height: 5 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+
+    color: "#D8D8D8",
+    shadowOffset: { width: -1, height: 5 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
   },
   card: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#fff",
+    backgroundColor: "#f1f1f1",
     paddingTop: 2,
     paddingBottom: 2,
     paddingRight: 14,
     paddingLeft: 14,
     borderTopRightRadius: 25,
     borderBottomRightRadius: 25,
+    paddingVertical: 10,
+    height: 90,
+
     shadowColor: "#D8D8D8",
     shadowOffset: { width: -1, height: 5 },
     shadowOpacity: 0.8,
@@ -947,6 +1066,8 @@ const styles = StyleSheet.create({
     paddingRight: 14,
     paddingLeft: 14,
     borderRadius: 25,
+    height: 40,
+    justifyContent: "center",
   },
   imgtest: {
     borderRadius: 50,
@@ -977,12 +1098,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 
   modalContainer: {
     width: "85%",
-    height: "70%",
+    height: "80%",
     padding: 0,
     backgroundColor: "white",
     borderRadius: 10,
@@ -1028,6 +1149,17 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
   },
+  showRegButton: {
+    flex: 1,
+    marginTop: 15,
+    backgroundColor: "#B090D9",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    height: 45,
+    justifyContent: "center",
+  },
   regButton: {
     flex: 1,
     marginTop: 15,
@@ -1040,12 +1172,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   imgReg: {
-    marginVertical: 0,
-    height: 55,
-    width: 55,
-    borderRadius: 50,
+    height: 40,
+    width: 40,
+    borderRadius: 25,
     borderWidth: 2,
     borderColor: "#8F5CD1",
+    overflow: "hidden",
+  },
+  imageContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 50,
+    width: 50,
+  },
+  regText: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  regTextName: {
+    fontWeight: "700",
+    fontFamily: "MPO",
+  },
+  regTextInfos: {
+    fontFamily: "Lato",
   },
   modalReg: {
     width: "85%",
@@ -1065,7 +1214,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   info: {
     fontSize: 15,

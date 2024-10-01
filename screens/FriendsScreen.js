@@ -71,7 +71,7 @@ const FriendsScreen = ({ navigation }) => {
       <Modal transparent visible={showModal} animationType="slide">
         <View style={styles.modal}>
           <View style={styles.modalWindow}>
-            <Text style={styles.modalText}> Confirmez-vous supression ? </Text>
+            <Text style={styles.modalText}> Confirm friend's deletion ? </Text>
             <Text style={styles.modalName}> name</Text>
 
             <View style={styles.modalBtns}>
@@ -134,8 +134,14 @@ const FriendsScreen = ({ navigation }) => {
                 <View>
                   <Image
                     style={styles.img}
-                    source={{ uri: usera.id.profilePic }}
-                  ></Image>
+                    resizeMode="center"
+                    source={
+                      usera.id.profilePic &&
+                      usera.id.profilePic !== "No Profile Pic"
+                        ? { uri: usera.id.profilePic }
+                        : require("../assets/blank-profile.png") // Default image
+                    }
+                  />
                 </View>
 
                 <View style={styles.nbrMessage}>
@@ -160,13 +166,19 @@ const FriendsScreen = ({ navigation }) => {
                   marginTop: 6,
                 }}
               >
-                <Text style={{ fontWeight: "bold" }}>{usera.id.name}, </Text>
+                <Text style={{ fontWeight: "bold", fontFamily: "MPO" }}>
+                  {usera.id.name},{" "}
+                </Text>
 
-                <Text>{moment().diff(usera.id.birthdate, "years")} ans</Text>
+                <Text style={{ paddingTop: 3 }}>
+                  {moment().diff(usera.id.birthdate, "years")} years old
+                </Text>
               </View>
               <View style={styles.interestContainer}>
                 <View style={styles.interest}>
-                  <Text>Vélo</Text>
+                  <Text style={{ color: "#fff", fontFamily: "Lato" }}>
+                    Vélo
+                  </Text>
                 </View>
               </View>
               <Text
@@ -177,7 +189,7 @@ const FriendsScreen = ({ navigation }) => {
                   fontWeight: "bold",
                 }}
               >
-                Activités ensemple : 3
+                Events together : 3
               </Text>
 
               <View
@@ -186,7 +198,10 @@ const FriendsScreen = ({ navigation }) => {
                   width: "100%",
                   paddingLeft: 40,
                   paddingRight: 40,
-                  justifyContent: "space-between",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 5,
+                  height: 40,
                 }}
               >
                 <TouchableOpacity
@@ -218,7 +233,13 @@ const FriendsScreen = ({ navigation }) => {
                     });
                   }}
                 >
-                  <Text style={{ color: "#9879C3", fontWeight: "bold" }}>
+                  <Text
+                    style={{
+                      color: "#9660DA",
+                      fontWeight: "bold",
+                      fontFamily: "Lato",
+                    }}
+                  >
                     Message
                   </Text>
                 </TouchableOpacity>
@@ -229,8 +250,14 @@ const FriendsScreen = ({ navigation }) => {
                     setShowModal(true);
                   }}
                 >
-                  <Text style={{ color: "#AE6C6B", fontWeight: "bold" }}>
-                    Supprimer cet ami
+                  <Text
+                    style={{
+                      color: "#E46986",
+                      fontWeight: "bold",
+                      fontFamily: "Lato",
+                    }}
+                  >
+                    Delete friend
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -278,13 +305,19 @@ const styles = StyleSheet.create({
   },
 
   friendsContainer: {
-    height: "20%",
+    height: "25%",
     width: "100%",
-    backgroundColor: "#D8D8D8",
+    backgroundColor: "#f1f1f1",
     borderRadius: 25,
-    borderWidth: 2.5,
-    borderColor: "#4B3196",
+    // borderWidth: 2.5,
+    // borderColor: "#4B3196",
     marginBottom: 30,
+
+    shadowColor: "#4B3196",
+    shadowOffset: { width: 2, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 2,
+    padding: 10,
   },
 
   img: {
@@ -300,11 +333,12 @@ const styles = StyleSheet.create({
 
   nbrMessage: {
     fontSize: 12,
+    fontFamily: "Lato",
     color: "white",
     backgroundColor: "#4B3196",
     padding: 5,
     borderRadius: 10,
-    marginTop: -5,
+    marginTop: -10,
   },
   interestContainer: {
     marginTop: 20,
@@ -312,29 +346,38 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   interest: {
-    backgroundColor: "#AA8BD4",
+    backgroundColor: "#9660DA",
     borderRadius: 50,
-    paddingTop: 3,
-    paddingBottom: 3,
-    paddingRight: 8,
-    paddingLeft: 8,
+    padding: 10,
+    color: "#fff",
   },
   msg: {
+    flex: 1,
     backgroundColor: "white",
-    borderRadius: 50,
+    borderRadius: 10,
     paddingTop: 3,
     paddingBottom: 3,
     paddingRight: 8,
     paddingLeft: 8,
     marginRight: 20,
+
+    alignItems: "center",
+    justifyContent: "center",
+    height: 35,
+    width: 100,
   },
   delete: {
+    flex: 1,
     backgroundColor: "white",
-    borderRadius: 50,
+    borderRadius: 10,
     paddingTop: 3,
     paddingBottom: 3,
     paddingRight: 8,
     paddingLeft: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 35,
+    width: 100,
   },
   modal: {
     flex: 1,
@@ -363,7 +406,7 @@ const styles = StyleSheet.create({
     width: "40%",
     borderRadius: 15,
     padding: 10,
-    backgroundColor: "#AA8BD4",
+    backgroundColor: "#9660DA",
   },
   cBtn: {
     alignItems: "center",

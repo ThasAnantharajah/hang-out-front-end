@@ -228,6 +228,7 @@ const EventCreationScreen = ({ navigation }) => {
                     fontWeight: "bold",
                     marginBottom: 20,
                     color: "#8F5CD1",
+                    fontFamily: "ManropeBold",
                   }}
                 >
                   Activity details
@@ -380,6 +381,7 @@ const EventCreationScreen = ({ navigation }) => {
                     fontWeight: "bold",
                     marginBottom: 20,
                     color: "#8F5CD1",
+                    fontFamily: "Manrope",
                   }}
                 >
                   Sports & Hobbies
@@ -403,10 +405,11 @@ const EventCreationScreen = ({ navigation }) => {
                       color: "#C8C8C8",
                     }}
                     dropdownStyles={{
-                      height: 120,
-                      borderWidth: "none",
+                      height: 180,
+
+                      borderWidth: 1,
+                      borderColor: "#C8C8C8",
                       backgroundColor: "#fff",
-                      width: 300,
                     }}
                     dropdownShown={false}
                     badgeStyles={{ backgroundColor: "#B090D9", fontSize: 15 }}
@@ -436,14 +439,16 @@ const EventCreationScreen = ({ navigation }) => {
                       borderRadius: 8,
                       padding: 5,
                       margin: 5,
-                      // height: 45,
+                      height: 45,
                       color: "#C8C8C8",
                     }}
                     dropdownStyles={{
-                      height: 120,
+                      height: 180,
                       borderWidth: "none",
                       backgroundColor: "#fff",
-                      width: 300,
+
+                      borderWidth: 1,
+                      borderColor: "#C8C8C8",
                     }}
                     dropdownShown={false}
                     badgeStyles={{ backgroundColor: "#B090D9", fontSize: 15 }}
@@ -457,7 +462,9 @@ const EventCreationScreen = ({ navigation }) => {
                 ) : null}
 
                 <View style={styles.slider}>
-                  <Text>Involves expenses </Text>
+                  <Text style={{ fontFamily: "Lato", fontSize: 15 }}>
+                    Involves expenses{" "}
+                  </Text>
                   <Switch
                     trackColor={{ false: "#767577", true: "#9660DA" }}
                     thumbColor={expensesIncluded ? "#f4f3f4" : "#f4f3f4"}
@@ -467,7 +474,9 @@ const EventCreationScreen = ({ navigation }) => {
                   />
                 </View>
                 <View style={styles.slider}>
-                  <Text>Female-only event </Text>
+                  <Text style={{ fontFamily: "Lato", fontSize: 15 }}>
+                    Female-only event{" "}
+                  </Text>
                   <Switch
                     trackColor={{ false: "#767577", true: "#9660DA" }}
                     thumbColor={femaleOnly ? "#f4f3f4" : "#f4f3f4"}
@@ -493,7 +502,7 @@ const EventCreationScreen = ({ navigation }) => {
                       console.log("Canceled event creation.");
                     }}
                   >
-                    <Text style={styles.buttonText}>Previous</Text>
+                    <Text style={styles.buttonText}>Cancel</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.nextButton}>
                     <Text
@@ -536,6 +545,7 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 5,
     height: 45,
+    fontFamily: "Lato",
   },
   title: {
     width: "100%",
@@ -549,7 +559,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     alignItems: "center",
-    paddingTop: 28,
     paddingBottom: 28,
     paddingRight: 28,
     paddingLeft: 28,
@@ -619,6 +628,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
     fontSize: 16,
+    fontFamily: "Lato",
   },
   slider: {
     flex: 1,

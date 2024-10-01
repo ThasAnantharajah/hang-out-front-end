@@ -221,22 +221,49 @@ const ProfileScreen = ({ navigation }) => {
         >
           <ScrollView style={{ flex: 1 }}>
             <View style={styles.inputContainer}>
-              <Text
+              <View
                 style={{
-                  fontSize: 22,
-                  fontWeight: "bold",
-                  marginBottom: 25,
-                  color: "#8F5CD1",
+                  flexDirection: "row",
                 }}
               >
-                Update my profile
-              </Text>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("TabNavigator", { screen: "Home" })
+                  }
+                >
+                  <Image
+                    source={require("../assets/logo.png")}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      // marginVertical: -100,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginRight: 10,
+                    }}
+                  />
+                </TouchableOpacity>
+                <Text
+                  style={{
+                    fontSize: 22,
+                    fontWeight: "bold",
+                    marginBottom: 25,
+                    color: "#8F5CD1",
+                    fontFamily: "ManropeBold",
+                    paddingTop: 5,
+                  }}
+                >
+                  Update my profile
+                </Text>
+              </View>
+
               <Text
                 style={{
                   fontWeight: "600",
                   color: "#09051F",
                   paddingLeft: 4,
                   marginBottom: 5,
+                  fontFamily: "Lato",
                 }}
               >
                 Your name
@@ -257,6 +284,7 @@ const ProfileScreen = ({ navigation }) => {
                     color: "#09051F",
                     paddingLeft: 4,
                     marginBottom: 5,
+                    fontFamily: "Lato",
                   }}
                 >
                   Date of birth
@@ -267,6 +295,7 @@ const ProfileScreen = ({ navigation }) => {
                     color: "#09051F",
                     paddingLeft: 4,
                     marginBottom: 5,
+                    fontFamily: "Lato",
                   }}
                 >
                   Gender
@@ -336,6 +365,7 @@ const ProfileScreen = ({ navigation }) => {
                   paddingLeft: 4,
                   marginBottom: 5,
                   paddingTop: 5,
+                  fontFamily: "Lato",
                 }}
               >
                 Where are you from?
@@ -362,8 +392,9 @@ const ProfileScreen = ({ navigation }) => {
                 style={{
                   fontSize: 18,
                   fontWeight: "bold",
-                  marginBottom: 10,
                   color: "#8F5CD1",
+                  fontFamily: "Manrope",
+                  marginVertical: 20,
                 }}
               >
                 Description
@@ -374,6 +405,7 @@ const ProfileScreen = ({ navigation }) => {
                   color: "#09051F",
                   paddingLeft: 4,
                   marginBottom: 5,
+                  fontFamily: "Lato",
                 }}
               >
                 Tell us more about yourself
@@ -396,9 +428,9 @@ const ProfileScreen = ({ navigation }) => {
                 style={{
                   fontSize: 18,
                   fontWeight: "bold",
-                  marginTop: 10,
-                  marginBottom: 10,
                   color: "#8F5CD1",
+                  fontFamily: "Manrope",
+                  marginVertical: 20,
                 }}
               >
                 Sports & Hobbies
@@ -410,6 +442,7 @@ const ProfileScreen = ({ navigation }) => {
                   color: "#09051F",
                   paddingLeft: 4,
                   marginBottom: 5,
+                  fontFamily: "Lato",
                 }}
               >
                 Pick your favorite activities and sports !
@@ -565,7 +598,7 @@ const ProfileScreen = ({ navigation }) => {
                 <FontAwesome style={styles.check} name="check" />
               </View>
             </View>
-            <Text style={{ fontSize: 18, fontFamily: "Roboto", fontSize: 17 }}>
+            <Text style={{ fontSize: 18, fontFamily: "Lato", fontSize: 17 }}>
               {ageCalc()} years
             </Text>
           </View>
@@ -583,7 +616,7 @@ const ProfileScreen = ({ navigation }) => {
                 color: "#9480BC",
                 fontSize: 18,
                 marginRight: 5,
-                fontFamily: "RobotoBold",
+                fontFamily: "LatoBold",
               }}
             >
               {userInfo.city}
@@ -606,7 +639,7 @@ const ProfileScreen = ({ navigation }) => {
                 marginTop: 20,
                 marginBottom: 10,
                 fontSize: 16,
-                fontFamily: "Roboto",
+                fontFamily: "Lato",
                 paddingBottom: 15,
               }}
             >
@@ -658,25 +691,14 @@ const ProfileScreen = ({ navigation }) => {
               >
                 Ce que les autres pensent
               </Text>
-              <Text
-                style={{
-                  fontStyle: "italic",
-                  textAlign: "center",
-                  color: "grey",
-                  marginBottom: 25,
-                  fontFamily: "Roboto",
-                  fontSize: 15,
-                  paddingHorizontal: 35,
-                }}
-              >
-                Engage in new events to get reviews from other members !
-              </Text>
               <View
                 style={{
                   flex: 1,
                   flexDirection: "row",
                   flexWrap: "wrap",
                   gap: 10,
+                  marginVertical: 10,
+                  // justifyContent: "center",
                 }}
               >
                 <View style={{ flexDirection: "row", marginRight: 10 }}>
@@ -719,6 +741,27 @@ const ProfileScreen = ({ navigation }) => {
                     <Text>1</Text>
                   </View>
                 </View>
+              </View>
+              <View
+                style={{
+                  marginVertical: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontStyle: "italic",
+                    textAlign: "center",
+                    color: "grey",
+                    marginBottom: 25,
+                    fontFamily: "Lato",
+                    fontSize: 16,
+                    paddingHorizontal: 35,
+                  }}
+                >
+                  Engage in new events to get reviews from other members !
+                </Text>
               </View>
             </View>
           </View>
@@ -799,8 +842,8 @@ const styles = StyleSheet.create({
   },
   roundedText: {
     color: "#fff",
-    fontFamily: "Roboto",
-    fontSize: 15,
+    fontFamily: "Lato",
+    fontSize: 15.5,
   },
   pref: {
     width: "100%",
@@ -819,7 +862,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderTopLeftRadius: 25,
     borderBottomLeftRadius: 25,
-    fontFamily: "Roboto",
+    fontFamily: "Lato",
   },
   reviewCount: {
     backgroundColor: "#BD9BE4",
@@ -836,11 +879,14 @@ const styles = StyleSheet.create({
     padding: 10,
     width: "45%",
     backgroundColor: "darkgrey",
+    fontFamily: "Lato",
   },
   nextButton: {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 8,
+    fontFamily: "Lato",
+
     width: "45%",
     backgroundColor: "#9660DA",
   },
@@ -849,6 +895,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 16,
     textAlign: "center",
+    fontFamily: "Lato",
   },
   inputProfile: {
     flex: 1,
@@ -858,6 +905,7 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 5,
     height: 45,
+    fontFamily: "Lato",
   },
   logOutBtn: {
     backgroundColor: "#EE6262",
